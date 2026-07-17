@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Resultado de tu pago — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .resultado-wrap{
+    max-width:520px; margin:0 auto; padding:80px 32px 100px; text-align:center;
+  }
+  .resultado-icono{
+    width:88px; height:88px; border-radius:50%; margin:0 auto 28px;
+    display:flex; align-items:center; justify-content:center; font-size:40px;
+  }
+  .resultado-icono.aprobado{ background:var(--blush); color:var(--accent-deep); }
+  .resultado-icono.rechazado{ background:#F7E3DE; color:#A0522D; }
+  .resultado-icono.pendiente{ background:var(--gold); color:#7A5A16; }
+  .resultado-titulo{ font-size:26px; font-weight:500; margin-bottom:12px; }
+  .resultado-texto{ color:var(--grey); font-size:14.5px; line-height:1.7; margin-bottom:32px; }
+  .resultado-acciones{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+</nav>
+
+<div class="resultado-wrap" id="resultado-wrap">
+  <div class="resultado-icono" id="resultado-icono">⏳</div>
+  <h1 class="resultado-titulo" id="resultado-titulo">Verificando tu pago…</h1>
+  <p class="resultado-texto" id="resultado-texto">Un momento por favor.</p>
+  <div class="resultado-acciones" id="resultado-acciones"></div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var status = params.get('collection_status') || params.get('status') || 'pending';
+
+    var icono = document.getElementById('resultado-icono');
+    var titulo = document.getElementById('resultado-titulo');
+    var texto = document.getElementById('resultado-texto');
+    var acciones = document.getElementById('resultado-acciones');
+
+    var botonInicio = '<a class="btn btn-outline" href="index.html">Volver al inicio</a>';
+    var botonCuenta = '<a class="btn btn-primary" href="cuenta.html">Ver mis pedidos</a>';
+
+    if (status === 'approved') {
+      icono.className = 'resultado-icono aprobado';
+      icono.textContent = '✓';
+      titulo.textContent = '¡Tu pago se completó!';
+      texto.textContent = 'Gracias por tu compra. Ya puedes ver el detalle en tu cuenta — si compraste un curso, el PDF ya está disponible para descargar.';
+      acciones.innerHTML = botonCuenta + botonInicio;
+    } else if (status === 'rejected') {
+      icono.className = 'resultado-icono rechazado';
+      icono.textContent = '✕';
+      titulo.textContent = 'Tu pago no pudo procesarse';
+      texto.textContent = 'Puedes intentarlo de nuevo desde tu carrito, o contactarnos por WhatsApp si el problema persiste.';
+      acciones.innerHTML = '<a class="btn btn-primary" href="checkout.html">Reintentar pago</a>' + botonInicio;
+    } else {
+      icono.className = 'resultado-icono pendiente';
+      icono.textContent = '⏳';
+      titulo.textContent = 'Tu pago está en proceso';
+      texto.textContent = 'Esto es normal con pagos en OXXO o SPEI — te avisaremos por correo en cuanto se confirme, y podrás verlo también en tu cuenta.';
+      acciones.innerHTML = botonCuenta + botonInicio;
+    }
+  })();
+</script>
+</body>
+</html>

@@ -61,6 +61,12 @@ def crear_preferencia(
         "items": items_mp,
         "external_reference": pedido.id,
         "notification_url": os.getenv("MERCADOPAGO_WEBHOOK_URL"),
+        "back_urls": {
+            "success": f"{FRONTEND_URL}/pago-resultado.html",
+            "failure": f"{FRONTEND_URL}/pago-resultado.html",
+            "pending": f"{FRONTEND_URL}/pago-resultado.html",
+        },
+        "auto_return": "approved",
     }
 
     resultado = sdk.preference().create(preference_data)
