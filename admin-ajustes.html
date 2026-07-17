@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Ajustes generales — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item active" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar"><h1>Ajustes generales</h1></div>
+
+    <div class="admin-panel" style="max-width:640px;">
+      <label class="small">Días mínimos de anticipación (pedidos personalizados)</label>
+      <input type="text" id="cfg-dias" style="margin-bottom:4px;">
+      <p class="helper" style="margin-bottom:20px;">Se usa para validar la fecha en el formulario de cotización.</p>
+
+      <label class="small">Número de WhatsApp de contacto</label>
+      <input type="text" id="cfg-whatsapp" style="margin-bottom:4px;">
+      <p class="helper" style="margin-bottom:20px;">Es el número que se muestra al cliente después de enviar una cotización.</p>
+
+      <label class="small">Correo para notificaciones de nuevas cotizaciones</label>
+      <input type="text" id="cfg-correo" style="margin-bottom:4px;">
+      <p class="helper" style="margin-bottom:20px;"></p>
+
+      <button class="btn btn-primary" id="btn-guardar-ajustes" style="padding:10px 20px; font-size:13px;">Guardar ajustes</button>
+      <span id="ajustes-feedback" style="font-size:13px; margin-left:12px; color:var(--accent-deep);"></span>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  async function obtenerConfig(clave) {
+    const res = await fetch(`${API_BASE_URL}/api/configuracion/${clave}`);
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.valor;
+  }
+
+  async function guardarConfig(clave, valor) {
+    return authFetch(`${API_BASE_URL}/api/configuracion/${clave}?valor=${encodeURIComponent(valor)}`, {
+      method: 'PUT',
+    });
+  }
+
+  async function cargarAjustes() {
+    document.getElementById('cfg-dias').value = await obtenerConfig('dias_minimos_anticipacion');
+    document.getElementById('cfg-whatsapp').value = await obtenerConfig('whatsapp_contacto');
+    document.getElementById('cfg-correo').value = await obtenerConfig('correo_notificaciones');
+  }
+
+  document.getElementById('btn-guardar-ajustes').addEventListener('click', async function () {
+    const feedback = document.getElementById('ajustes-feedback');
+    feedback.textContent = 'Guardando...';
+    try {
+      await Promise.all([
+        guardarConfig('dias_minimos_anticipacion', document.getElementById('cfg-dias').value),
+        guardarConfig('whatsapp_contacto', document.getElementById('cfg-whatsapp').value),
+        guardarConfig('correo_notificaciones', document.getElementById('cfg-correo').value),
+      ]);
+      feedback.textContent = '✓ Ajustes guardados';
+    } catch {
+      feedback.textContent = 'Error al guardar';
+    }
+    setTimeout(() => { feedback.textContent = ''; }, 2500);
+  });
+
+  cargarAjustes();
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Panel Admin — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item active" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <h1>Reportes de ventas</h1>
+    </div>
+
+    <div class="kpis" id="kpis-container">
+      <div class="kpi"><div class="label">Ventas totales (mes)</div><div class="value">—</div></div>
+      <div class="kpi"><div class="label">Pedidos (pasteles)</div><div class="value">—</div></div>
+      <div class="kpi"><div class="label">Cursos vendidos</div><div class="value">—</div></div>
+      <div class="kpi"><div class="label">Ticket promedio</div><div class="value">—</div></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="admin-panel">
+        <h3>Ventas por semana</h3>
+        <div class="bar-chart" id="bar-chart"></div>
+      </div>
+      <div class="admin-panel">
+        <h3>Pasteles vs. Cursos</h3>
+        <div class="donut-wrap">
+          <div class="donut" id="donut"></div>
+          <div class="legend" id="donut-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-panel">
+      <h3>Pedidos recientes</h3>
+      <table class="admin-table" id="recientes-table">
+        <tr><th>Pedido</th><th>Tipo</th><th>Sucursal</th><th>Estado</th><th>Total</th></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  async function cargarReportes() {
+    const [reporte, sucursales] = await Promise.all([
+      authFetch(`${API_BASE_URL}/api/reportes/resumen`).then(r => r.json()),
+      fetchSucursales(),
+    ]);
+    const mapaSucursales = Object.fromEntries(sucursales.map(s => [s.id, s.nombre]));
+
+    const kpisEl = document.getElementById('kpis-container');
+    kpisEl.innerHTML = `
+      <div class="kpi"><div class="label">Ventas totales (mes)</div><div class="value">$${reporte.ventas_totales.toLocaleString('es-MX')}</div></div>
+      <div class="kpi"><div class="label">Pedidos (pasteles)</div><div class="value">${reporte.pedidos_pasteles}</div></div>
+      <div class="kpi"><div class="label">Cursos vendidos</div><div class="value">${reporte.cursos_vendidos}</div></div>
+      <div class="kpi"><div class="label">Ticket promedio</div><div class="value">$${reporte.ticket_promedio.toLocaleString('es-MX')}</div></div>`;
+
+    document.getElementById('bar-chart').innerHTML = reporte.ventas_por_semana.map(s => `
+      <div class="bar-col"><div class="bar" style="height:${s.porcentaje}%;"></div><div class="bar-label">${s.label}</div></div>`).join('');
+
+    document.getElementById('donut').style.background =
+      `conic-gradient(#8D582E 0% ${reporte.pct_pasteles}%, #F6D47D ${reporte.pct_pasteles}% 100%)`;
+    document.getElementById('donut-legend').innerHTML = `
+      <div><span class="dot" style="background:#8D582E;"></span> Pasteles · ${reporte.pct_pasteles}%</div>
+      <div><span class="dot" style="background:#F6D47D;"></span> Cursos · ${reporte.pct_cursos}%</div>`;
+
+    const tabla = document.getElementById('recientes-table');
+    tabla.innerHTML = '<tr><th>Pedido</th><th>Tipo</th><th>Sucursal</th><th>Estado</th><th>Total</th></tr>' +
+      reporte.pedidos_recientes.map(r => `
+        <tr>
+          <td>#${r.id.slice(0, 8)}</td>
+          <td><span class="tag ${r.tipo === 'pastel' ? 'pastel' : 'curso'}">${r.tipo === 'pastel' ? 'Pastel' : 'Curso'}</span></td>
+          <td>${r.sucursal_id ? (mapaSucursales[r.sucursal_id] || '—') : '—'}</td>
+          <td><span class="status ${r.estado === 'entregado' || r.estado === 'aprobado' ? 'entregado' : 'produccion'}">${r.estado}</span></td>
+          <td>$${r.total.toLocaleString('es-MX')}</td>
+        </tr>`).join('');
+  }
+
+  cargarReportes();
+</script>
+</body>
+</html>

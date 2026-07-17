@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Cursos — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html">Catálogo</a></li>
+    <li><a href="cursos.html" class="active">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <a class="nav-icon-btn" href="checkout.html" aria-label="Carrito">
+      🛒<span class="cart-icon-count" style="display:none;"></span>
+    </a>
+    <a class="nav-icon-btn" id="account-link" href="login.html" aria-label="Mi cuenta">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">Cursos</div>
+  <h1>Aprende alta repostería a tu ritmo</h1>
+  <p>Guías completas en PDF, escritas por Niza Isabela, con técnicas y recetas paso a paso.</p>
+  <div class="format-note">📄 Formato PDF descargable — acceso inmediato tras la compra</div>
+</div>
+
+<div class="grid" id="cursos-grid">
+  <p style="grid-column:1/-1; text-align:center; color:var(--grey);">Cargando cursos…</p>
+</div>
+
+<div class="how-it-works">
+  <h3>¿Cómo funciona?</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h5>Compra en línea</h5><p>Pago seguro con Mercado Pago, igual que el catálogo de pasteles.</p></div>
+    <div class="step"><div class="step-num">2</div><h5>Accede al instante</h5><p>El curso aparece en "Mis cursos" dentro de tu cuenta, listo para descargar.</p></div>
+    <div class="step"><div class="step-num">3</div><h5>Respaldo por correo</h5><p>También te enviamos el enlace de descarga a tu correo, por si lo prefieres.</p></div>
+  </div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<!-- MODAL DE VISTA RÁPIDA — CURSOS -->
+<div class="modal-overlay" id="courseView">
+  <div class="modal">
+    <button class="modal-close">✕</button>
+    <div class="modal-photo" id="cvPhoto">Portada</div>
+    <div class="modal-body">
+      <div class="eyebrow">Curso en PDF</div>
+      <h3 id="cvTitle">Nombre del curso</h3>
+      <div class="price" id="cvPrice">$0 MXN</div>
+      <p id="cvDesc">Descripción</p>
+      <a class="btn btn-primary btn-block" id="cvBuyLink" href="checkout.html">Comprar este curso</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

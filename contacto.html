@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Contacto — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html">Catálogo</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html" class="active">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <a class="nav-icon-btn" href="checkout.html" aria-label="Carrito">
+      🛒<span class="cart-icon-count" style="display:none;"></span>
+    </a>
+    <a class="nav-icon-btn" id="account-link" href="login.html" aria-label="Mi cuenta">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">Contacto</div>
+  <h1>¿Tienes una duda?</h1>
+</div>
+
+<div class="form-wrap" style="padding-top:20px;">
+  <a class="btn btn-primary btn-block" id="wa-contacto-link" href="#" target="_blank" rel="noopener" style="margin-bottom:20px;">💬 Escríbenos por WhatsApp</a>  
+<form class="panel" id="form-contacto">
+    <div class="field"><label>Nombre</label><input type="text" id="contacto-nombre" placeholder="Tu nombre" required></div>
+    <div class="field"><label>Correo</label><input type="email" id="contacto-correo" placeholder="tú@correo.com" required></div>
+    <div class="field"><label>Mensaje</label><textarea id="contacto-mensaje" placeholder="¿En qué te ayudamos?" required></textarea></div>
+    <button class="btn btn-outline btn-block" type="submit">Enviar mensaje</button>
+    <p id="contacto-feedback" class="form-feedback"></p>
+</form>
+
+  <div class="row2" id="contacto-sucursales" style="margin-top:24px;">
+    <p style="color:var(--grey); grid-column:1/-1; text-align:center;">Cargando sucursales…</p>
+  </div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

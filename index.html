@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Niza Isabela — Pastelería y Cursos en Amecameca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Inicio</a></li>
+    <li><a href="catalogo.html">Catálogo</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <a class="nav-icon-btn" href="checkout.html" aria-label="Carrito">
+      🛒<span class="cart-icon-count" style="display:none;"></span>
+    </a>
+    <a class="nav-icon-btn" id="account-link" href="login.html" aria-label="Mi cuenta">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<section class="hero fade-scroll-section">
+  <div>
+    <div class="eyebrow hero-anim-item">Amecameca · Pastelería</div>
+    <h1 class="hero-anim-item">Pasteles para cada <em>ocasión</em>, hechos con calma</h1>
+    <p class="hero-anim-item">Elige entre nuestro catálogo listo para pedir, o diseña con nosotros el pastel que tienes en mente. Tú decides cómo.</p>
+    <div class="cta-row hero-anim-item">
+      <a class="btn btn-primary" href="catalogo.html">Ver catálogo</a>
+      <a class="btn btn-outline" href="cotizacion.html">Diseñar mi pastel</a>
+    </div>
+  </div>
+  <div class="photo-block hero-anim-item">FOTO — pastel insignia, fotografía grande de producto</div>
+</section>
+
+<div class="divider">
+  <svg viewBox="0 0 120 40" fill="none">
+    <path d="M2 20 C 30 5, 45 35, 60 20 S 95 5, 118 20" stroke="#B8862E" stroke-width="1.4" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<div class="categories fade-scroll-section">
+  <a class="cat-card a" href="catalogo.html">
+    <div><div class="cat-label">Catálogo fijo</div><h3>Compra y recibe</h3></div>
+    <div class="arrow">→</div>
+  </a>
+  <a class="cat-card b" href="cotizacion.html">
+    <div><div class="cat-label">Personalizados</div><h3>Diseña tu pastel</h3></div>
+    <div class="arrow">→</div>
+  </a>
+</div>
+
+<div class="section-head fade-scroll-section">
+  <div class="eyebrow">Lo más pedido</div>
+  <h2>Del catálogo a tu mesa</h2>
+  <p>Una selección de nuestros favoritos — foto grande, lo esencial a la vista, y todo el detalle a un toque de distancia.</p>
+</div>
+
+<div class="grid" id="catalog-grid-home">
+  <p style="grid-column:1/-1; text-align:center; color:var(--grey);">Cargando catálogo…</p>
+</div>
+
+<div class="courses-band fade-scroll-section">
+  <div class="courses-inner">
+    <div class="courses-head">
+      <div>
+        <div class="eyebrow">Cursos en línea</div>
+        <h2>Aprende alta repostería con nosotros</h2>
+        <p>Guías completas en PDF, escritas por Niza Isabela — técnicas y recetas paso a paso, a tu ritmo.</p>
+      </div>
+      <a class="courses-cta" href="cursos.html">Ver todos los cursos →</a>
+    </div>
+    <div class="courses-grid" id="courses-grid-home">
+      <p style="grid-column:1/-1; color:#D8CBB0; text-align:center;">Cargando cursos…</p>
+    </div>
+  </div>
+</div>
+
+<div class="about fade-scroll-section">
+  <div class="about-inner">
+    <div class="about-photo"></div>
+    <div>
+      <h2>Hecho a mano, en Amecameca</h2>
+      <p>Niza Isabela nace del gusto por hacer pasteles que se sienten personales — ya sea uno de nuestros clásicos o uno diseñado contigo, pieza por pieza, en nuestras dos sucursales.</p>
+      <a class="btn btn-outline" href="nosotros.html">Conoce nuestra historia</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <a class="logo" href="index.html" style="margin-bottom:14px; display:inline-block;">Niza <span>Isabela</span></a>
+      <p style="color:var(--grey); max-width:280px;">Pastelería en Amecameca. Catálogo listo para pedir, pasteles diseñados contigo, y cursos de alta repostería.</p>
+    </div>
+    <div>
+      <h5>Sucursales</h5>
+      <div id="footer-sucursales">Cargando…</div>
+    </div>
+    <div>
+      <h5>Contacto</h5>
+      <a href="contacto.html">WhatsApp</a>
+      <a href="contacto.html">Instagram</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© Niza Isabela Pastelería — Amecameca, México</div>
+</footer>
+
+<!-- MODAL DE VISTA RÁPIDA -->
+<div class="modal-overlay" id="quickView">
+  <div class="modal">
+    <button class="modal-close">✕</button>
+    <div class="modal-photo" id="qvPhoto">FOTO</div>
+    <div class="modal-body">
+      <div class="eyebrow">Catálogo fijo</div>
+      <h3 id="qvTitle">Nombre del producto</h3>
+      <div class="price" id="qvPrice">$0 MXN</div>
+      <p id="qvDesc">Descripción</p>
+      <div class="field" id="qvTamanoWrap" style="display:none;">
+        <label>Tamaño</label>
+        <div class="options" id="qvTamanoOptions"></div>
+      </div>
+      <div class="qty-row">
+        <div class="qty-box">
+          <button class="qty-minus" type="button">−</button>
+          <span class="qty-value">1</span>
+          <button class="qty-plus" type="button">+</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="qvAddToCart">Agregar al carrito</button>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Iniciar sesión — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>.msg{font-size:13px; margin-top:14px; text-align:center;} .msg.error{color:#A0522D;} .msg.ok{color:#5B7A4E;}</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+</nav>
+
+<div class="form-wrap" style="max-width:420px;">
+  <div class="form-head">
+    <div class="eyebrow">Mi cuenta</div>
+    <h1>Iniciar sesión</h1>
+    <p>Para ver tus pedidos, cotizaciones y cursos comprados.</p>
+  </div>
+
+  <form class="panel" id="login-form">
+    <div class="field"><label>Correo</label><input type="email" id="email" required></div>
+    <div class="field"><label>Contraseña</label><input type="password" id="password" required></div>
+    <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+    <div class="msg" id="login-msg"></div>
+  </form>
+
+  <p style="text-align:center; margin-top:20px; font-size:13.5px; color:var(--grey);">
+    ¿No tienes cuenta? <a href="registro.html" style="color:var(--accent-deep); font-weight:600;">Regístrate aquí</a>
+  </p>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>
+  document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const msg = document.getElementById('login-msg');
+    msg.textContent = 'Entrando...'; msg.className = 'msg';
+    try {
+      const data = await nizaLogin(
+        document.getElementById('email').value,
+        document.getElementById('password').value
+      );
+      msg.textContent = `¡Bienvenida/o, ${data.usuario.nombre}!`;
+      msg.className = 'msg ok';
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    } catch (err) {
+      msg.textContent = err.message;
+      msg.className = 'msg error';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Cursos — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .item-row{ display:grid; grid-template-columns:56px 1fr auto auto auto; gap:16px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
+  .item-row:last-child{ border-bottom:none; }
+  .thumb-sq{ width:56px; height:56px; border-radius:6px; background:linear-gradient(160deg,#F6ECD8,#F0CE86); }
+  .item-title{ font-size:14px; font-weight:500; }
+  .item-sub{ font-size:11.5px; color:var(--grey); }
+  .toggle{ position:relative; width:38px; height:22px; background:var(--line); border-radius:20px; cursor:pointer; }
+  .toggle.on{ background:#5B7A4E; }
+  .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:.2s; }
+  .toggle.on::after{ left:18px; }
+  .btn-mini{ font-size:12px; padding:7px 14px; border:1px solid var(--line); border-radius:6px; background:#fff; cursor:pointer; }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item active" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <h1>Cursos</h1>
+      <button class="btn btn-primary" style="padding:10px 20px; font-size:13px;" onclick="abrirModalCurso()">+ Subir nuevo curso</button>
+    </div>
+
+    <div class="admin-panel" id="cursos-list">
+      <p style="text-align:center; color:var(--grey);">Cargando cursos…</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CURSO -->
+<div class="modal-overlay" id="curso-modal">
+  <div class="modal" style="grid-template-columns:1fr; max-width:520px;">
+    <button class="modal-close" onclick="cerrarModalCurso()">✕</button>
+    <div class="modal-body">
+      <h3 id="curso-modal-title">Nuevo curso</h3>
+      <input type="hidden" id="curso-id">
+      <label class="small">Nombre</label>
+      <input type="text" id="curso-nombre" style="margin-bottom:14px;">
+      <label class="small">Descripción</label>
+      <textarea id="curso-descripcion" style="margin-bottom:14px;"></textarea>
+      <label class="small">Precio (MXN)</label>
+      <input type="number" id="curso-precio" style="margin-bottom:14px;">
+      <label class="small">Portada del curso</label>
+      <div style="margin-bottom:14px;">
+        <input type="file" id="curso-portada-file" accept="image/*" hidden>
+        <input type="hidden" id="curso-portada">
+        <label for="curso-portada-file" class="upload-trigger" id="curso-portada-trigger">
+          <span class="upload-icon">📷</span>
+          <span>Toca para subir una portada</span>
+        </label>
+        <div class="upload-result" id="curso-portada-result" style="display:none;">
+          <img id="curso-portada-img" class="upload-thumb">
+          <div class="upload-result-info">
+            <span class="upload-check">✓ Imagen subida correctamente</span>
+            <button type="button" class="upload-change-btn" onclick="document.getElementById('curso-portada-file').click()">Cambiar foto</button>
+          </div>
+        </div>
+        <span class="upload-status" id="curso-portada-status"></span>
+      </div>
+      <label class="small">Archivo PDF del curso</label>
+      <div style="margin-bottom:14px;">
+        <input type="file" id="curso-pdf-file" accept="application/pdf" hidden>
+        <input type="hidden" id="curso-pdf">
+        <label for="curso-pdf-file" class="upload-trigger" id="curso-pdf-trigger">
+          <span class="upload-icon">📄</span>
+          <span>Toca para subir el PDF del curso</span>
+        </label>
+        <div class="upload-result" id="curso-pdf-result" style="display:none;">
+          <div class="upload-doc-icon">📄</div>
+          <div class="upload-result-info">
+            <span class="upload-check">✓ PDF subido correctamente</span>
+            <span class="upload-doc-name" id="curso-pdf-name"></span>
+            <button type="button" class="upload-change-btn" onclick="document.getElementById('curso-pdf-file').click()">Cambiar archivo</button>
+          </div>
+        </div>
+        <span class="upload-status" id="curso-pdf-status"></span>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:20px;">
+        <input type="checkbox" id="curso-activo"> Curso activo (visible en el sitio)
+      </label>
+      <button class="btn btn-primary btn-block" onclick="guardarCurso()">Guardar curso</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  let cursosCache = [];
+
+  function cursoItemHTML(c) {
+    return `
+      <div class="item-row">
+        <div class="thumb-sq" style="${c.portada_url ? `background-image:url('${c.portada_url}'); background-size:cover;` : ''}"></div>
+        <div>
+          <div class="item-title">${c.nombre}</div>
+          <div class="item-sub">${c.archivo_pdf_url ? 'PDF cargado' : 'Sin PDF cargado aún'}</div>
+        </div>
+        <div style="font-size:13px; font-weight:600;">${c.activo ? '$' + Number(c.precio_final).toFixed(0) + ' MXN' : '—'}</div>
+        <div class="toggle ${c.activo ? 'on' : ''}" title="${c.activo ? 'Activo' : 'Inactivo'}" onclick="toggleCursoActivo('${c.id}')"></div>
+        <button class="btn-mini" onclick="editarCurso('${c.id}')">${c.archivo_pdf_url ? 'Editar' : 'Editar'}</button>
+      </div>`;
+  }
+
+  async function cargarCursosAdmin() {
+    const cont = document.getElementById('cursos-list');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/cursos/admin/todos`);
+      cursosCache = await res.json();
+      cont.innerHTML = cursosCache.map(cursoItemHTML).join('') || '<p style="text-align:center; color:var(--grey);">No hay cursos todavía.</p>';
+    } catch {
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar los cursos.</p>';
+    }
+  }
+
+  function abrirModalCurso(curso) {
+    document.getElementById('curso-modal-title').textContent = curso ? 'Editar curso' : 'Nuevo curso';
+    document.getElementById('curso-id').value = curso ? curso.id : '';
+    document.getElementById('curso-nombre').value = curso ? curso.nombre : '';
+    document.getElementById('curso-descripcion').value = curso ? (curso.descripcion || '') : '';
+    document.getElementById('curso-precio').value = curso ? curso.precio_original : '';
+    document.getElementById('curso-portada').value = curso ? (curso.portada_url || '') : '';
+    document.getElementById('curso-portada-file').value = '';
+    document.getElementById('curso-portada-status').textContent = '';
+    document.getElementById('curso-portada-status').className = 'upload-status';
+    if (curso && curso.portada_url) {
+      document.getElementById('curso-portada-img').src = curso.portada_url;
+      document.getElementById('curso-portada-result').style.display = 'flex';
+      document.getElementById('curso-portada-trigger').style.display = 'none';
+    } else {
+      document.getElementById('curso-portada-result').style.display = 'none';
+      document.getElementById('curso-portada-trigger').style.display = 'flex';
+    }
+    document.getElementById('curso-pdf').value = curso ? (curso.archivo_pdf_url || '') : '';
+    document.getElementById('curso-pdf-file').value = '';
+    document.getElementById('curso-pdf-status').textContent = '';
+    document.getElementById('curso-pdf-status').className = 'upload-status';
+    if (curso && curso.archivo_pdf_url) {
+      document.getElementById('curso-pdf-name').textContent = curso.archivo_pdf_url.split('/').pop();
+      document.getElementById('curso-pdf-result').style.display = 'flex';
+      document.getElementById('curso-pdf-trigger').style.display = 'none';
+    } else {
+      document.getElementById('curso-pdf-result').style.display = 'none';
+      document.getElementById('curso-pdf-trigger').style.display = 'flex';
+    }
+    document.getElementById('curso-activo').checked = curso ? curso.activo : true;
+    document.getElementById('curso-modal').classList.add('open');
+  }
+
+  function editarCurso(id) {
+    const curso = cursosCache.find(c => c.id === id);
+    abrirModalCurso(curso);
+  }
+
+  function cerrarModalCurso() {
+    document.getElementById('curso-modal').classList.remove('open');
+  }
+
+  async function guardarCurso() {
+    const id = document.getElementById('curso-id').value;
+    const datos = {
+      nombre: document.getElementById('curso-nombre').value,
+      descripcion: document.getElementById('curso-descripcion').value,
+      precio: parseFloat(document.getElementById('curso-precio').value),
+      portada_url: document.getElementById('curso-portada').value,
+      archivo_pdf_url: document.getElementById('curso-pdf').value,
+      activo: document.getElementById('curso-activo').checked,
+    };
+    const url = id ? `${API_BASE_URL}/api/cursos/admin/${id}` : `${API_BASE_URL}/api/cursos/admin`;
+    try {
+      const res = await authFetch(url, {
+        method: id ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!res.ok) throw new Error();
+      cerrarModalCurso();
+      cargarCursosAdmin();
+    } catch {
+      alert('Hubo un error al guardar el curso.');
+    }
+  }
+
+  async function toggleCursoActivo(id) {
+    const curso = cursosCache.find(c => c.id === id);
+    const datos = {
+      nombre: curso.nombre,
+      descripcion: curso.descripcion,
+      precio: curso.precio_original,
+      portada_url: curso.portada_url,
+      archivo_pdf_url: curso.archivo_pdf_url,
+      activo: !curso.activo,
+    };
+    await authFetch(`${API_BASE_URL}/api/cursos/admin/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos),
+    });
+    cargarCursosAdmin();
+  }
+
+
+document.getElementById('curso-portada-file').addEventListener('change', async function (e) {
+  const archivo = e.target.files[0];
+  if (!archivo) return;
+  const status = document.getElementById('curso-portada-status');
+  const trigger = document.getElementById('curso-portada-trigger');
+  status.className = 'upload-status uploading';
+  status.textContent = 'Subiendo imagen...';
+  try {
+    const url = await subirArchivo(archivo, 'imagen');
+    document.getElementById('curso-portada').value = url;
+    document.getElementById('curso-portada-img').src = url;
+    document.getElementById('curso-portada-result').style.display = 'flex';
+    trigger.style.display = 'none';
+    status.className = 'upload-status';
+    status.textContent = '';
+  } catch {
+    status.className = 'upload-status error';
+    status.textContent = 'Error al subir la imagen. Intenta de nuevo.';
+  }
+});
+
+document.getElementById('curso-pdf-file').addEventListener('change', async function (e) {
+  const archivo = e.target.files[0];
+  if (!archivo) return;
+  const status = document.getElementById('curso-pdf-status');
+  const trigger = document.getElementById('curso-pdf-trigger');
+  status.className = 'upload-status uploading';
+  status.textContent = 'Subiendo PDF...';
+  try {
+    const url = await subirArchivo(archivo, 'pdf');
+    document.getElementById('curso-pdf').value = url;
+    document.getElementById('curso-pdf-name').textContent = archivo.name;
+    document.getElementById('curso-pdf-result').style.display = 'flex';
+    trigger.style.display = 'none';
+    status.className = 'upload-status';
+    status.textContent = '';
+  } catch {
+    status.className = 'upload-status error';
+    status.textContent = 'Error al subir el PDF. Intenta de nuevo.';
+  }
+});
+  cargarCursosAdmin();
+</script>
+</body>
+</html>

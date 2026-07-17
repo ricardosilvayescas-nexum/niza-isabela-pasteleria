@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Red Velvet — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html" class="active">Catálogo</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <span>🛒</span><a id="account-link" href="login.html" style="text-decoration:none; color:inherit;">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<div class="breadcrumb"><a href="catalogo.html">Catálogo</a> <span>›</span> Pasteles <span>›</span> Red Velvet</div>
+
+<div class="detail">
+  <div>
+    <div class="photo">FOTO grande del producto</div>
+    <div class="thumbs"><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div></div>
+  </div>
+  <div>
+    <div class="eyebrow">Catálogo fijo</div>
+    <h1 class="title">Red Velvet</h1>
+    <div class="price">$520 MXN</div>
+    <p class="desc">Bizcocho rojo aterciopelado con betún de queso crema. Ideal para 8–10 personas. Disponible para recoger en cualquiera de nuestras 2 sucursales en Amecameca, o pedir a domicilio.</p>
+
+    <div class="field">
+      <label>Tamaño</label>
+      <div class="options">
+        <div class="opt">Chico (6 personas)</div>
+        <div class="opt selected">Mediano (10 personas)</div>
+        <div class="opt">Grande (16 personas)</div>
+      </div>
+    </div>
+
+    <div class="qty-row">
+      <div class="qty-box">
+        <button class="qty-minus" type="button">−</button>
+        <span class="qty-value">1</span>
+        <button class="qty-plus" type="button">+</button>
+      </div>
+      <span style="font-size:13px; color:var(--grey);">Disponible para entrega desde mañana</span>
+    </div>
+
+    <a class="btn btn-primary btn-block" href="checkout.html">Agregar al carrito</a>
+  </div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

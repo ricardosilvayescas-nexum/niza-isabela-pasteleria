@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Catálogo — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .item-row{ display:grid; grid-template-columns:56px 1fr auto auto auto auto; gap:16px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
+  .item-row:last-child{ border-bottom:none; }
+  .thumb-sq{ width:56px; height:56px; border-radius:6px; background:linear-gradient(160deg,#F6ECD8,#F0CE86); }
+  .item-title{ font-size:14px; font-weight:500; }
+  .item-sub{ font-size:11.5px; color:var(--grey); }
+  .toggle{ position:relative; width:38px; height:22px; background:var(--line); border-radius:20px; cursor:pointer; }
+  .toggle.on{ background:#5B7A4E; }
+  .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:.2s; }
+  .toggle.on::after{ left:18px; }
+  .btn-mini{ font-size:12px; padding:7px 14px; border:1px solid var(--line); border-radius:6px; background:#fff; cursor:pointer; }
+  .filters-mini{ display:flex; gap:8px; margin-bottom:18px; }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item active" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <h1>Catálogo de pasteles</h1>
+      <button class="btn btn-primary" style="padding:10px 20px; font-size:13px;" onclick="abrirModalProducto()">+ Agregar producto</button>
+    </div>
+
+    <div class="filters" style="justify-content:flex-start; padding:0 0 20px;">
+      <div class="filter active" data-cat-filter="todos">Todos</div>
+      <div class="filter" data-cat-filter="fijo">Catálogo fijo</div>
+      <div class="filter" data-cat-filter="personalizable">Personalizables</div>
+    </div>
+
+    <div class="admin-panel" id="productos-list">
+      <p style="text-align:center; color:var(--grey);">Cargando productos…</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="producto-modal">
+  <div class="modal" style="grid-template-columns:1fr; max-width:520px;">
+    <button class="modal-close" onclick="cerrarModalProducto()">✕</button>
+    <div class="modal-body">
+      <h3 id="producto-modal-title">Nuevo producto</h3>
+      <input type="hidden" id="producto-id">
+      <label class="small">Nombre</label>
+      <input type="text" id="producto-nombre" style="margin-bottom:14px;">
+      <label class="small">Descripción</label>
+      <textarea id="producto-descripcion" style="margin-bottom:14px;"></textarea>
+      <label class="small">Tipo</label>
+      <select id="producto-tipo" style="margin-bottom:14px;">
+        <option value="fijo">Catálogo fijo</option>
+        <option value="personalizable">Personalizable</option>
+      </select>
+      <label class="small">Precio base (MXN)</label>
+      <input type="number" id="producto-precio" style="margin-bottom:14px;">
+      <label class="small">Foto del producto</label>
+      <div style="margin-bottom:14px;">
+        <input type="file" id="producto-foto-file" accept="image/*" hidden>
+        <input type="hidden" id="producto-foto">
+        <label for="producto-foto-file" class="upload-trigger" id="producto-foto-trigger">
+          <span class="upload-icon">📷</span>
+          <span>Toca para subir una foto</span>
+        </label>
+        <div class="upload-result" id="producto-foto-result" style="display:none;">
+          <img id="producto-foto-img" class="upload-thumb">
+          <div class="upload-result-info">
+            <span class="upload-check">✓ Imagen subida correctamente</span>
+            <button type="button" class="upload-change-btn" onclick="document.getElementById('producto-foto-file').click()">Cambiar foto</button>
+          </div>
+        </div>
+        <span class="upload-status" id="producto-foto-status"></span>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:20px;">
+        <input type="checkbox" id="producto-activo"> Producto activo (visible en el catálogo)
+      </label>
+      <div id="producto-tamanos-wrap" style="display:none; margin-bottom:20px;">
+        <label class="small">Tamaños disponibles (solo catálogo fijo)</label>
+        <div id="producto-tamanos-list" style="margin-bottom:10px;"></div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="nuevo-tamano-nombre" placeholder="Ej. Chico — 10 personas" style="flex:1;">
+          <button class="btn-mini" type="button" onclick="agregarTamano()">+ Agregar</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="guardarProducto()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  let productosCache = [];
+  let filtroActual = 'todos';
+
+  function productoItemHTML(p) {
+    const precio = p.tipo === 'fijo'
+      ? `$${Number(p.precio_base || 0).toFixed(0)} MXN`
+      : `Desde $${Number(p.precio_base || 0).toFixed(0)} MXN`;
+    return `
+      <div class="item-row" data-cat="${p.tipo}">
+        <div class="thumb-sq" style="${p.foto_url ? `background-image:url('${p.foto_url}'); background-size:cover;` : ''}"></div>
+        <div>
+          <div class="item-title">${p.nombre}</div>
+          <div class="item-sub">${p.tipo === 'fijo' ? 'Catálogo fijo' : 'Personalizable'}</div>
+        </div>
+        <div style="font-size:13px; font-weight:600;">${p.activo ? precio : '—'}</div>
+        <div class="toggle ${p.activo ? 'on' : ''}" title="${p.activo ? 'Activo' : 'Inactivo'}" onclick="toggleProductoActivo('${p.id}')"></div>
+        <button class="btn-mini" onclick="editarProducto('${p.id}')">Editar</button>
+      </div>`;
+  }
+
+  function renderizarProductos() {
+    const cont = document.getElementById('productos-list');
+    const filtrados = filtroActual === 'todos'
+      ? productosCache
+      : productosCache.filter(p => p.tipo === filtroActual);
+    cont.innerHTML = filtrados.map(productoItemHTML).join('') || '<p style="text-align:center; color:var(--grey);">No hay productos en esta categoría.</p>';
+  }
+
+  async function cargarProductosAdmin() {
+    const cont = document.getElementById('productos-list');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/productos/admin/todos`);
+      productosCache = await res.json();
+      renderizarProductos();
+    } catch {
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar los productos.</p>';
+    }
+  }
+
+  function abrirModalProducto(producto) {
+    document.getElementById('producto-modal-title').textContent = producto ? 'Editar producto' : 'Nuevo producto';
+    document.getElementById('producto-id').value = producto ? producto.id : '';
+    document.getElementById('producto-nombre').value = producto ? producto.nombre : '';
+    document.getElementById('producto-descripcion').value = producto ? (producto.descripcion || '') : '';
+    document.getElementById('producto-tipo').value = producto ? producto.tipo : 'fijo';
+    document.getElementById('producto-precio').value = producto ? (producto.precio_base || '') : '';
+    document.getElementById('producto-foto').value = producto ? (producto.foto_url || '') : '';
+    document.getElementById('producto-foto-file').value = '';
+    document.getElementById('producto-foto-status').textContent = '';
+    document.getElementById('producto-foto-status').className = 'upload-status';
+    if (producto && producto.foto_url) {
+      document.getElementById('producto-foto-img').src = producto.foto_url;
+      document.getElementById('producto-foto-result').style.display = 'flex';
+      document.getElementById('producto-foto-trigger').style.display = 'none';
+    } else {
+      document.getElementById('producto-foto-result').style.display = 'none';
+      document.getElementById('producto-foto-trigger').style.display = 'flex';
+    }
+    document.getElementById('producto-activo').checked = producto ? producto.activo : true;
+    document.getElementById('producto-tamanos-wrap').style.display = 'none';
+    document.getElementById('producto-modal').classList.add('open');
+  }
+
+  function editarProducto(id) {
+    const producto = productosCache.find(p => p.id === id);
+    abrirModalProducto(producto);
+    if (producto.tipo === 'fijo') {
+      document.getElementById('producto-tamanos-wrap').style.display = 'block';
+      refrescarTamanos(id);
+    }
+  }
+
+  function cerrarModalProducto() {
+    document.getElementById('producto-modal').classList.remove('open');
+  }
+
+  function tamanoRowHTML(o) {
+    return `<div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--line);">
+      <span>${o.nombre}</span>
+      <button class="btn-mini" type="button" onclick="eliminarTamano('${o.id}')">✕</button>
+    </div>`;
+  }
+
+  function refrescarTamanos(productoId) {
+    const producto = productosCache.find(p => p.id === productoId);
+    const tamanos = (producto.opciones || []).filter(o => o.tipo_opcion === 'tamaño');
+    document.getElementById('producto-tamanos-list').innerHTML =
+      tamanos.map(tamanoRowHTML).join('') || '<p style="color:var(--grey); font-size:12px;">Sin tamaños todavía.</p>';
+  }
+
+  async function agregarTamano() {
+    const productoId = document.getElementById('producto-id').value;
+    const nombre = document.getElementById('nuevo-tamano-nombre').value.trim();
+    if (!nombre) return;
+    await authFetch(`${API_BASE_URL}/api/productos/admin/${productoId}/opciones`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo_opcion: 'tamaño', nombre, precio_extra: 0 }),
+    });
+    document.getElementById('nuevo-tamano-nombre').value = '';
+    await cargarProductosAdmin();
+    refrescarTamanos(productoId);
+  }
+
+  async function eliminarTamano(opcionId) {
+    const productoId = document.getElementById('producto-id').value;
+    await authFetch(`${API_BASE_URL}/api/productos/admin/opciones/${opcionId}`, { method: 'DELETE' });
+    await cargarProductosAdmin();
+    refrescarTamanos(productoId);
+  }
+
+
+  async function eliminarOpcion(opcionId) {
+    const productoId = document.getElementById('producto-id').value;
+    await authFetch(`${API_BASE_URL}/api/productos/admin/opciones/${opcionId}`, { method: 'DELETE' });
+    await cargarProductosAdmin();
+    refrescarOpciones(productoId);
+  }
+
+  async function guardarProducto() {
+    const id = document.getElementById('producto-id').value;
+    const datos = {
+      nombre: document.getElementById('producto-nombre').value,
+      descripcion: document.getElementById('producto-descripcion').value,
+      tipo: document.getElementById('producto-tipo').value,
+      precio_base: parseFloat(document.getElementById('producto-precio').value) || null,
+      foto_url: document.getElementById('producto-foto').value,
+      activo: document.getElementById('producto-activo').checked,
+    };
+    const url = id ? `${API_BASE_URL}/api/productos/admin/${id}` : `${API_BASE_URL}/api/productos/admin`;
+    try {
+      const res = await authFetch(url, {
+        method: id ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!res.ok) throw new Error();
+      cerrarModalProducto();
+      cargarProductosAdmin();
+    } catch {
+      alert('Hubo un error al guardar el producto.');
+    }
+  }
+
+  async function toggleProductoActivo(id) {
+    const p = productosCache.find(p => p.id === id);
+    const datos = {
+      nombre: p.nombre, descripcion: p.descripcion, tipo: p.tipo,
+      precio_base: p.precio_base, foto_url: p.foto_url, activo: !p.activo,
+    };
+    await authFetch(`${API_BASE_URL}/api/productos/admin/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos),
+    });
+    cargarProductosAdmin();
+  }
+
+  document.querySelectorAll('[data-cat-filter]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('[data-cat-filter]').forEach(f => f.classList.remove('active'));
+      btn.classList.add('active');
+      filtroActual = btn.dataset.catFilter;
+      renderizarProductos();
+    });
+  });
+
+
+  document.getElementById('producto-foto-file').addEventListener('change', async function (e) {
+  const archivo = e.target.files[0];
+  if (!archivo) return;
+  const status = document.getElementById('producto-foto-status');
+  const trigger = document.getElementById('producto-foto-trigger');
+  status.className = 'upload-status uploading';
+  status.textContent = 'Subiendo imagen...';
+  try {
+    const url = await subirArchivo(archivo, 'imagen');
+    document.getElementById('producto-foto').value = url;
+    document.getElementById('producto-foto-img').src = url;
+    document.getElementById('producto-foto-result').style.display = 'flex';
+    trigger.style.display = 'none';
+    status.className = 'upload-status';
+    status.textContent = '';
+  } catch {
+    status.className = 'upload-status error';
+    status.textContent = 'Error al subir la imagen. Intenta de nuevo.';
+  }
+});
+
+  cargarProductosAdmin();
+</script>
+</body>
+</html>

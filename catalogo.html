@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Catálogo — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html" class="active">Catálogo</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <a class="nav-icon-btn" href="checkout.html" aria-label="Carrito">
+      🛒<span class="cart-icon-count" style="display:none;"></span>
+    </a>
+    <a class="nav-icon-btn" id="account-link" href="login.html" aria-label="Mi cuenta">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">Catálogo</div>
+  <h1>Todo lo que hacemos, en un solo lugar</h1>
+  <p>Elige un pastel listo para pedir, o uno personalizable si tienes algo especial en mente.</p>
+</div>
+
+<div class="filters">
+  <div class="filter active" data-filter="todos">Todos</div>
+  <div class="filter" data-filter="fijo">Catálogo fijo</div>
+  <div class="filter" data-filter="personalizado">Personalizados</div>
+</div>
+
+<div class="grid" id="catalog-grid">
+  <p style="grid-column:1/-1; text-align:center; color:var(--grey);">Cargando catálogo…</p>
+</div>
+
+<div class="note-strip">
+  <p>Los productos "Personalizable" no se agregan al carrito — te llevan a un formulario de cotización para definir los detalles contigo.</p>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<!-- MODAL DE VISTA RÁPIDA -->
+<div class="modal-overlay" id="quickView">
+  <div class="modal">
+    <button class="modal-close">✕</button>
+    <div class="modal-photo" id="qvPhoto">FOTO</div>
+    <div class="modal-body">
+      <div class="eyebrow">Catálogo fijo</div>
+      <h3 id="qvTitle">Nombre del producto</h3>
+      <div class="price" id="qvPrice">$0 MXN</div>
+      <p id="qvDesc">Descripción</p>
+      <div class="field" id="qvTamanoWrap" style="display:none;">
+        <label>Personas</label>
+        <div class="options" id="qvTamanoOptions"></div>
+      </div>
+      <div class="qty-row">
+        <div class="qty-box">
+          <button class="qty-minus" type="button">−</button>
+          <span class="qty-value">1</span>
+          <button class="qty-plus" type="button">+</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="qvAddToCart">Agregar al carrito</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

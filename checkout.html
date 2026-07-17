@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Checkout — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <div class="nav-icons"><span>🛒 Carrito</span></div>
+</nav>
+
+<div class="steps-bar">
+  <div class="step-pill done">1. Entrega</div>
+  <div class="step-pill active">2. Fecha</div>
+  <div class="step-pill">3. Pago</div>
+</div>
+
+<div class="layout-2col">
+  <div>
+    <div class="panel">
+      <h3>Pastel de catálogo — método de recepción</h3>
+      <div class="options" style="margin-bottom:18px;" id="tipo-entrega-options">
+        <div class="opt selected" data-entrega="recoger">Recoger en sucursal</div>
+        <div class="opt" data-entrega="delivery">Delivery</div>
+      </div>
+      <div id="checkout-sucursal-rows">
+        <p style="color:var(--grey); font-size:13px;">Cargando sucursales…</p>
+      </div>
+      <label class="small" style="margin-top:16px; display:block;">Fecha de recolección</label>
+      <input type="date" id="checkout-fecha">
+      <div id="delivery-direccion-wrap" style="display:none; margin-top:16px;">
+        <label class="small">Dirección de entrega</label>
+        <textarea id="checkout-direccion" placeholder="Calle, número, colonia, referencias..."></textarea>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Curso digital — sin entrega física</h3>
+      <div class="digital-note">📄 "Fundamentos de Repostería Francesa" no requiere sucursal ni fecha — el acceso se activa automáticamente al confirmar el pago, en "Mis cursos" y por correo.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Resumen del pedido</h3>
+    <div id="checkout-cart-items">
+      <p style="color:var(--grey); font-size:13px; text-align:center;">Cargando carrito…</p>
+    </div>
+    <div class="sum-total"><span>Total</span><span id="checkout-total">$0 MXN</span></div>
+    <div class="pay-methods">
+      <span class="pay-pill">💳 Tarjeta</span><span class="pay-pill">🏪 OXXO</span><span class="pay-pill">🏦 SPEI</span>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-pagar">Pagar con Mercado Pago</button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+</body>
+</html>

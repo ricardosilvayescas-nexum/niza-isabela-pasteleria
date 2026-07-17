@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Mi cuenta — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .account-section{ margin-bottom:14px; }
+  .account-section summary{ cursor:pointer; font-weight:600; padding:16px 0; list-style:none; }
+  .account-item{ font-size:13px; padding:10px 0; border-bottom:1px solid var(--line); }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html">Catálogo</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <span>🛒</span>
+    <a id="account-link" href="login.html" style="text-decoration:none; color:inherit;">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<div class="form-wrap">
+  <div class="form-head">
+    <div class="eyebrow">Mi cuenta</div>
+    <h1 id="saludo">Hola</h1>
+    <p id="correo-usuario"></p>
+  </div>
+
+  <div class="panel">
+    <details class="account-section" open>
+      <summary>🧁 Mis pedidos</summary>
+      <div id="lista-pedidos"><p class="account-item">Cargando…</p></div>
+    </details>
+    <details class="account-section">
+      <summary>✉️ Mis cotizaciones</summary>
+      <div id="lista-cotizaciones"><p class="account-item">Cargando…</p></div>
+    </details>
+    <details class="account-section">
+      <summary>📄 Mis cursos</summary>
+      <div id="lista-cursos"><p class="account-item">Cargando…</p></div>
+    </details>
+  </div>
+
+  <button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="nizaLogout()">Cerrar sesión</button>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>
+  (function () {
+    const usuario = getStoredUser();
+    if (!usuario) { window.location.href = 'login.html'; return; }
+    document.getElementById('saludo').textContent = `Hola, ${usuario.nombre}`;
+    document.getElementById('correo-usuario').textContent = usuario.email;
+
+    authFetch(`${API_BASE_URL}/api/pedidos/mis-pedidos`).then(r => r.ok ? r.json() : []).then(pedidos => {
+      const el = document.getElementById('lista-pedidos');
+      el.innerHTML = pedidos.length
+        ? pedidos.map(p => `<div class="account-item">#${p.id.slice(0,8)} — ${p.estado} — $${p.total} MXN</div>`).join('')
+        : '<p class="account-item">Aún no tienes pedidos.</p>';
+    }).catch(() => {});
+
+    authFetch(`${API_BASE_URL}/api/cursos/mis-cursos/todos`).then(r => r.ok ? r.json() : []).then(cursos => {
+      const el = document.getElementById('lista-cursos');
+      el.innerHTML = cursos.length
+        ? cursos.map(c => `<div class="account-item">${c.nombre} — <a href="${c.archivo_pdf_url}" target="_blank">Descargar PDF</a></div>`).join('')
+        : '<p class="account-item">Aún no has comprado cursos.</p>';
+    }).catch(() => {});
+
+    document.getElementById('lista-cotizaciones').innerHTML =
+      '<p class="account-item">Tus cotizaciones enviadas aparecerán aquí.</p>';
+  })();
+</script>
+</body>
+</html>

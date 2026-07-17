@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Cotiza tu pastel — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="catalogo.html">Catálogo</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="nosotros.html">Nosotros</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a class="admin-pill" id="admin-pill-link" href="admin.html" style="display:none;">Panel admin 🔒</a>
+    <a class="nav-icon-btn" href="checkout.html" aria-label="Carrito">
+      🛒<span class="cart-icon-count" style="display:none;"></span>
+    </a>
+    <a class="nav-icon-btn" id="account-link" href="login.html" aria-label="Mi cuenta">👤</a>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </div>
+</nav>
+
+<div class="form-wrap">
+  <div class="form-head">
+    <div class="eyebrow">Pastel personalizado</div>
+    <h1>Cuéntanos qué tienes en mente</h1>
+    <p>Con estos datos, Niza Isabela te contacta por WhatsApp para afinar el diseño y coordinar el pago.</p>
+  </div>
+
+  <form class="panel" id="quote-form">
+    <div class="row2">
+      <div class="field">
+        <label>Tamaño aproximado</label>
+        <select><option>10–15 personas</option><option>20–30 personas</option><option>40+ personas</option></select>
+      </div>
+      <div class="field">
+        <label>Sucursal de referencia</label>
+        <select id="cotiza-sucursal-select"><option>Cargando…</option></select>
+      </div>
+    </div>
+    <div class="row2">
+    <div class="field">
+      <label>Relleno</label>
+      <select id="cotiza-relleno"><option>Durazno</option><option>Cajeta</option><option>Chocolate</option><option>Frutos rojos</option></select>
+    </div>
+    <div class="field">
+      <label>Sabor</label>
+      <select id="cotiza-sabor"><option>Vainilla</option><option>Chocolate</option><option>Red Velvet</option><option>Tres leches</option></select>
+    </div>
+    </div>
+
+    <div class="field">
+      <label>Decoración deseada</label>
+      <textarea id="cotiza-decoracion" placeholder="Describe el estilo, colores, tema del pastel..." required></textarea>
+    </div>
+
+    <div class="field">
+      <label>Foto de referencia (opcional)</label>
+      <input type="file" id="cotiza-foto-file" accept="image/*" hidden>
+      <input type="hidden" id="cotiza-foto-url">
+      <label for="cotiza-foto-file" class="upload-trigger" id="cotiza-foto-trigger">
+        <span class="upload-icon">📷</span>
+        <span>Arrastra una imagen o toca para subir</span>
+      </label>
+      <div class="upload-result" id="cotiza-foto-result" style="display:none;">
+        <img id="cotiza-foto-img" class="upload-thumb">
+        <div class="upload-result-info">
+          <span class="upload-check">✓ Imagen subida correctamente</span>
+          <button type="button" class="upload-change-btn" onclick="document.getElementById('cotiza-foto-file').click()">Cambiar foto</button>
+        </div>
+      </div>
+      <span class="upload-status" id="cotiza-foto-status"></span>
+    </div>
+
+    <div class="field">
+      <label>Mensaje en el pastel</label>
+      <input type="text" id="cotiza-mensaje" placeholder="Ej. Feliz cumpleaños Sofía">
+    </div>
+
+    <div class="field">
+      <label>Tu nombre</label>
+      <input type="text" id="cotiza-nombre" placeholder="Tu nombre completo" required>
+    </div>
+
+    <div class="field">
+      <label>Tu correo</label>
+      <input type="email" id="cotiza-correo" placeholder="tú@correo.com" required>
+    </div>
+
+    <div class="field">
+      <label>Tu teléfono (WhatsApp)</label>
+      <input type="tel" id="cotiza-telefono" placeholder="55 xxxx xxxx" required>
+      <p class="helper">Ingresa tu número a 10 dígitos, sin lada de país (ej. 5512345678).</p>
+    </div>
+
+    <div class="field">
+      <label>Fecha deseada</label>
+      <input type="date" id="fecha-deseada" required>
+<div class="warn" id="fecha-warning">⚠ Se requieren al menos <span id="dias-minimos-texto">3</span> días de anticipación. Puedes enviar la solicitud, pero Niza Isabela confirmará si es posible cumplir esa fecha.</div>    </div>
+
+    <button class="btn btn-primary btn-block" type="submit">Enviar solicitud</button>
+  </form>
+
+  <div class="after-submit" id="after-submit">
+    <p>✓ Solicitud enviada — ahora contáctanos para afinar los detalles y el pago</p>
+    <a class="wa-btn" href="https://wa.me/525500000000" target="_blank" rel="noopener">💬 Escribir por WhatsApp</a>
+  </div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>
+  const LIMITE_FOTO_MB = 20;
+
+  document.getElementById('cotiza-foto-file').addEventListener('change', async function (e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+
+    const status = document.getElementById('cotiza-foto-status');
+    const trigger = document.getElementById('cotiza-foto-trigger');
+
+    if (archivo.size > LIMITE_FOTO_MB * 1024 * 1024) {
+      status.className = 'upload-status error';
+      status.textContent = `La imagen supera el límite de ${LIMITE_FOTO_MB} MB. Elige una más ligera.`;
+      e.target.value = '';
+      return;
+    }
+
+    status.className = 'upload-status uploading';
+    status.textContent = 'Subiendo imagen...';
+    try {
+      const url = await subirArchivo(archivo, 'imagen');
+      document.getElementById('cotiza-foto-url').value = url;
+      document.getElementById('cotiza-foto-img').src = url;
+      document.getElementById('cotiza-foto-result').style.display = 'flex';
+      trigger.style.display = 'none';
+      status.className = 'upload-status';
+      status.textContent = '';
+    } catch {
+      status.className = 'upload-status error';
+      status.textContent = 'Error al subir la imagen. Intenta de nuevo.';
+    }
+  });
+</script>
+</body>
+</html>

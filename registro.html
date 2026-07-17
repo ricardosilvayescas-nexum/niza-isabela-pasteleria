@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Crear cuenta — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>.msg{font-size:13px; margin-top:14px; text-align:center;} .msg.error{color:#A0522D;} .msg.ok{color:#5B7A4E;}</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+</nav>
+
+<div class="form-wrap" style="max-width:420px;">
+  <div class="form-head">
+    <div class="eyebrow">Mi cuenta</div>
+    <h1>Crear cuenta</h1>
+    <p>Para hacer pedidos, cotizar pasteles y comprar cursos.</p>
+  </div>
+
+  <form class="panel" id="registro-form">
+    <div class="field"><label>Nombre completo</label><input type="text" id="nombre" required></div>
+    <div class="field"><label>Correo</label><input type="email" id="email" required></div>
+    <div class="field"><label>Teléfono (opcional)</label><input type="text" id="telefono"></div>
+    <div class="field"><label>Contraseña</label><input type="password" id="password" minlength="6" required></div>
+    <button class="btn btn-primary btn-block" type="submit">Crear cuenta</button>
+    <div class="msg" id="registro-msg"></div>
+  </form>
+
+  <p style="text-align:center; margin-top:20px; font-size:13.5px; color:var(--grey);">
+    ¿Ya tienes cuenta? <a href="login.html" style="color:var(--accent-deep); font-weight:600;">Inicia sesión</a>
+  </p>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script>
+  document.getElementById('registro-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const msg = document.getElementById('registro-msg');
+    msg.textContent = 'Creando cuenta...'; msg.className = 'msg';
+    try {
+      const data = await nizaRegistro({
+        nombre: document.getElementById('nombre').value,
+        email: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value,
+        password: document.getElementById('password').value,
+      });
+      msg.textContent = `¡Cuenta creada! Bienvenida/o, ${data.usuario.nombre}.`;
+      msg.className = 'msg ok';
+      setTimeout(() => { window.location.href = 'index.html'; }, 700);
+    } catch (err) {
+      msg.textContent = err.message;
+      msg.className = 'msg error';
+    }
+  });
+</script>
+</body>
+</html>

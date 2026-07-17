@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Sucursales — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .suc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .suc-card label{ display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; color:var(--grey); margin:14px 0 6px; }
+  .suc-card label:first-of-type{ margin-top:0; }
+  .suc-card input{ width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-family:'Inter'; font-size:13px; }
+  .btn-mini{ font-size:12px; padding:8px 16px; border:none; border-radius:2px; background:var(--ink); color:#fff; cursor:pointer; margin-top:16px; }
+  @media(max-width:700px){ .suc-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item active" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar"><h1>Sucursales</h1></div>
+
+    <div class="suc-grid" id="suc-grid">
+      <p style="grid-column:1/-1; text-align:center; color:var(--grey);">Cargando sucursales…</p>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  function sucCardHTML(s) {
+    return `
+      <div class="admin-panel suc-card" data-id="${s.id}">
+        <h3>${s.nombre}</h3>
+        <label>Nombre</label><input type="text" class="f-nombre" value="${s.nombre}">
+        <label>Dirección</label><input type="text" class="f-direccion" value="${s.direccion}">
+        <label>Horario</label><input type="text" class="f-horario" value="${s.horario || ''}">
+        <label>Teléfono</label><input type="text" class="f-telefono" value="${s.telefono || ''}">
+        <button class="btn-mini" onclick="guardarSucursal('${s.id}', this)">Guardar cambios</button>
+      </div>`;
+  }
+
+  async function cargarSucursales() {
+    const grid = document.getElementById('suc-grid');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/sucursales/`);
+      const sucursales = await res.json();
+      grid.innerHTML = sucursales.map(sucCardHTML).join('');
+    } catch {
+      grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--grey);">No se pudieron cargar las sucursales.</p>';
+    }
+  }
+
+  async function guardarSucursal(id, boton) {
+    const card = boton.closest('.suc-card');
+    const datos = {
+      nombre: card.querySelector('.f-nombre').value,
+      direccion: card.querySelector('.f-direccion').value,
+      horario: card.querySelector('.f-horario').value,
+      telefono: card.querySelector('.f-telefono').value,
+    };
+    boton.disabled = true;
+    boton.textContent = 'Guardando...';
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/sucursales/admin/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!res.ok) throw new Error();
+      boton.textContent = '✓ Guardado';
+    } catch {
+      boton.textContent = 'Error al guardar';
+    } finally {
+      boton.disabled = false;
+      setTimeout(() => { boton.textContent = 'Guardar cambios'; }, 2000);
+    }
+  }
+
+  cargarSucursales();
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Cotizaciones — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .quote-card{ border:1px solid var(--line); border-radius:8px; padding:20px; margin-bottom:14px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; }
+  .quote-card h4{ font-size:15px; margin-bottom:6px; }
+  .quote-meta{ font-size:12px; color:var(--grey); margin-bottom:10px; }
+  .quote-detail{ font-size:13px; color:var(--ink); line-height:1.7; }
+  .quote-detail b{ color:var(--accent-deep); }
+  .status-select{ font-size:11.5px; padding:6px 12px; border-radius:14px; border:1px solid var(--line); background:#fff; height:fit-content; }
+  .wa-mini{ font-size:11.5px; color:var(--accent-deep); text-decoration:none; font-weight:600; display:inline-block; margin-top:8px; }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item active" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar"><h1>Solicitudes de cotización</h1></div>
+    <div id="cotizaciones-list">
+      <p style="text-align:center; color:var(--grey);">Cargando cotizaciones…</p>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX PARA FOTO DE REFERENCIA -->
+<div class="modal-overlay" id="lightbox-overlay" onclick="if(event.target===this) cerrarLightbox()">
+  <div style="position:relative; max-width:90vw; max-height:90vh;">
+    <button class="modal-close" onclick="cerrarLightbox()" style="top:-14px; right:-14px;">✕</button>
+    <img id="lightbox-img" style="max-width:90vw; max-height:90vh; border-radius:8px; display:block;">
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  function tiempoRelativo(fechaISO) {
+    const diffMs = Date.now() - new Date(fechaISO).getTime();
+    const horas = Math.floor(diffMs / 3600000);
+    if (horas < 1) return 'Hace unos minutos';
+    if (horas < 24) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
+    const dias = Math.floor(horas / 24);
+    if (dias === 1) return 'Ayer';
+    return `Hace ${dias} días`;
+  }
+
+  function cotizacionCardHTML(c, mapaSucursales) {
+    const telefonoLimpio = (c.telefono_cliente || '').replace(/\D/g, '');
+    const mensaje = encodeURIComponent(
+      `Hola ${c.nombre_cliente || ''}, te contactamos de Niza Isabela sobre tu cotización de pastel (${c.tamano || ''}, ${c.sabor || ''}).`
+    );
+    const waLink = telefonoLimpio ? `https://wa.me/52${telefonoLimpio}?text=${mensaje}` : null;
+    return `
+      <div class="quote-card">
+        <div>
+          <h4>${c.nombre_cliente || 'Sin nombre'}</h4>
+          <div class="quote-meta">${tiempoRelativo(c.created_at)} · ${mapaSucursales[c.sucursal_id] || 'Sucursal desconocida'}</div>
+          <div class="quote-detail">
+            <b>Correo:</b> ${c.email_cliente || '—'} · <b>Teléfono:</b> ${c.telefono_cliente || '—'}<br>
+            <b>Tamaño:</b> ${c.tamano || '—'} · <b>Sabor:</b> ${c.sabor || '—'} · <b>Relleno:</b> ${c.relleno || '—'}<br>
+            <b>Decoración:</b> "${c.decoracion_texto || ''}"<br>
+            <b>Fecha deseada:</b> ${new Date(c.fecha_deseada).toLocaleDateString('es-MX')}${c.mensaje_pastel ? ' · <b>Mensaje:</b> "' + c.mensaje_pastel + '"' : ''}
+          </div>
+          ${c.foto_referencia_url
+            ? `<img src="${c.foto_referencia_url}" onclick="abrirLightbox('${c.foto_referencia_url}')" style="width:90px; height:90px; object-fit:cover; border-radius:6px; border:1px solid var(--line); cursor:pointer; display:block; margin-top:10px;" alt="Foto de referencia">`
+            : ''}
+          ${waLink
+            ? `<a class="wa-mini" href="${waLink}" target="_blank" rel="noopener">💬 Contactar por WhatsApp →</a>`
+            : `<span class="wa-mini" style="color:var(--grey);">Sin teléfono registrado</span>`}
+        </div>
+        <select class="status-select" onchange="cambiarEstado('${c.id}', this.value)">
+          <option value="nueva" ${c.estado === 'nueva' ? 'selected' : ''}>Nueva</option>
+          <option value="contactada" ${c.estado === 'contactada' ? 'selected' : ''}>Contactada</option>
+          <option value="cerrada" ${c.estado === 'cerrada' ? 'selected' : ''}>Cerrada</option>
+        </select>
+      </div>`;
+  }
+
+  async function cargarCotizaciones() {
+    const cont = document.getElementById('cotizaciones-list');
+    try {
+      const [cotizaciones, sucursales] = await Promise.all([
+        authFetch(`${API_BASE_URL}/api/cotizaciones/`).then(r => r.json()),
+        fetchSucursales(),
+      ]);
+      const mapaSucursales = Object.fromEntries(sucursales.map(s => [s.id, s.nombre]));
+      cont.innerHTML = cotizaciones.length
+        ? cotizaciones.map(c => cotizacionCardHTML(c, mapaSucursales)).join('')
+        : '<p style="text-align:center; color:var(--grey);">No hay cotizaciones todavía.</p>';
+    } catch {
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar las cotizaciones.</p>';
+    }
+  }
+
+  async function cambiarEstado(id, nuevoEstado) {
+    await authFetch(`${API_BASE_URL}/api/cotizaciones/${id}/estado?nuevo_estado=${nuevoEstado}`, { method: 'PATCH' });
+  }
+
+  function abrirLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox-overlay').classList.add('open');
+}
+
+function cerrarLightbox() {
+  document.getElementById('lightbox-overlay').classList.remove('open');
+}
+
+  cargarCotizaciones();
+</script>
+</body>
+</html>

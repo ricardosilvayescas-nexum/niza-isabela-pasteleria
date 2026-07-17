@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Dudas — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item active" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <h1>Dudas del formulario de contacto</h1>
+    </div>
+
+    <div class="admin-panel">
+      <table class="admin-table" id="dudas-table">
+        <tr><th>Nombre</th><th>Correo</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th></th></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  async function cargarDudas() {
+    const tabla = document.getElementById('dudas-table');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/contacto/admin`);
+      if (!res.ok) throw new Error();
+      const dudas = await res.json();
+      tabla.innerHTML = '<tr><th>Nombre</th><th>Correo</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th></th></tr>' +
+        dudas.map(d => `
+          <tr>
+            <td>${d.nombre}</td>
+            <td>${d.correo}</td>
+            <td>${d.mensaje}</td>
+            <td>${new Date(d.fecha_envio).toLocaleDateString('es-MX')}</td>
+            <td><span class="status ${d.leido ? 'entregado' : 'produccion'}">${d.leido ? 'Leído' : 'Nuevo'}</span></td>
+            <td>${d.leido ? '' : `<button class="btn-mini" onclick="marcarLeido('${d.contacto_mensaje_id}')">Marcar leído</button>`}</td>
+          </tr>`).join('');
+    } catch {
+      tabla.innerHTML = '<tr><td colspan="6">No se pudieron cargar las dudas.</td></tr>';
+    }
+  }
+
+  async function marcarLeido(id) {
+    await authFetch(`${API_BASE_URL}/contacto/admin/${id}`, { method: 'PATCH' });
+    cargarDudas();
+  }
+
+  cargarDudas();
+</script>
+</body>
+</html>

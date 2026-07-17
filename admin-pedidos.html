@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Pedidos — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .toolbar{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+  .toolbar select{ width:auto; padding:8px 14px; font-size:12.5px; border-radius:20px; }
+  .status-select{ font-size:11.5px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:#fff; }
+</style>
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item active" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <h1>Pedidos</h1>
+      <div class="period">+ Nuevo pedido manual</div>
+    </div>
+
+    <div class="toolbar">
+      <select id="filtro-sucursal"><option value="">Todas las sucursales</option></select>
+      <select id="filtro-estado">
+        <option value="">Todos los estados</option>
+        <option value="recibido">Recibido</option>
+        <option value="en_produccion">En producción</option>
+        <option value="listo">Listo</option>
+        <option value="entregado">Entregado</option>
+      </select>
+    </div>
+
+    <div class="admin-panel">
+      <table class="admin-table" id="pedidos-table">
+        <tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script>requireAdmin();</script>
+<script>
+  const ESTADOS = ['recibido', 'en_produccion', 'listo', 'entregado'];
+  const ESTADO_LABEL = { recibido: 'Recibido', en_produccion: 'En producción', listo: 'Listo', entregado: 'Entregado' };
+
+  function pedidoRowHTML(p, mapaSucursales) {
+    const opciones = ESTADOS.map(e => `<option value="${e}" ${e === p.estado ? 'selected' : ''}>${ESTADO_LABEL[e]}</option>`).join('');
+    return `
+      <tr>
+        <td>#${p.id.slice(0, 8)}</td>
+        <td>${p.cliente_nombre}</td>
+        <td>${p.productos}</td>
+        <td>${p.sucursal_id ? (mapaSucursales[p.sucursal_id] || '—') : '—'}</td>
+        <td>${p.tipo_entrega === 'recoger' || p.tipo_entrega === 'delivery' ? new Date(p.fecha_entrega).toLocaleDateString('es-MX') : 'Digital'}</td>
+        <td>$${p.total.toFixed(0)}</td>
+        <td><select class="status-select" onchange="cambiarEstadoPedido('${p.id}', this.value)">${opciones}</select></td>
+      </tr>`;
+  }
+
+  async function cargarPedidosAdmin() {
+    const tabla = document.getElementById('pedidos-table');
+    const sucursalId = document.getElementById('filtro-sucursal').value;
+    const estado = document.getElementById('filtro-estado').value;
+
+    try {
+      const params = new URLSearchParams();
+      if (sucursalId) params.set('sucursal_id', sucursalId);
+      if (estado) params.set('estado', estado);
+
+      const [pedidos, sucursales] = await Promise.all([
+        authFetch(`${API_BASE_URL}/api/pedidos/admin/completo?${params}`).then(r => r.json()),
+        fetchSucursales(),
+      ]);
+      const mapaSucursales = Object.fromEntries(sucursales.map(s => [s.id, s.nombre]));
+
+      tabla.innerHTML = '<tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th></tr>' +
+        (pedidos.length ? pedidos.map(p => pedidoRowHTML(p, mapaSucursales)).join('') : '<tr><td colspan="7" style="text-align:center; color:var(--grey);">No hay pedidos todavía.</td></tr>');
+
+      // Llenar el select de sucursales solo la primera vez
+      const filtroSucursal = document.getElementById('filtro-sucursal');
+      if (filtroSucursal.options.length === 1) {
+        sucursales.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id; opt.textContent = s.nombre;
+          filtroSucursal.appendChild(opt);
+        });
+      }
+    } catch {
+      tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey);">No se pudieron cargar los pedidos.</td></tr>';
+    }
+  }
+
+  async function cambiarEstadoPedido(id, nuevoEstado) {
+    await authFetch(`${API_BASE_URL}/api/pedidos/${id}/estado?nuevo_estado=${nuevoEstado}`, { method: 'PATCH' });
+  }
+
+  document.getElementById('filtro-sucursal').addEventListener('change', cargarPedidosAdmin);
+  document.getElementById('filtro-estado').addEventListener('change', cargarPedidosAdmin);
+
+  cargarPedidosAdmin();
+</script>
+</body>
+</html>
