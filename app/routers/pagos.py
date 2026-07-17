@@ -47,6 +47,16 @@ def crear_preferencia(
             "currency_id": "MXN",
         })
 
+    compras_curso = db.query(models.CompraCurso).filter(models.CompraCurso.pedido_id == pedido.id).all()
+    for compra in compras_curso:
+        curso = db.query(models.Curso).filter(models.Curso.id == compra.curso_id).first()
+        items_mp.append({
+            "title": curso.nombre if curso else "Curso",
+            "quantity": 1,
+            "unit_price": float(compra.monto),
+            "currency_id": "MXN",
+        })
+
     preference_data = {
         "items": items_mp,
         "external_reference": pedido.id,
@@ -112,6 +122,12 @@ async def webhook_mercadopago(request: Request, db: Session = Depends(get_db)):
 
     if pedido and estado_mp == "approved":
         pedido.estado = "en_produccion"
+
+    if pedido:
+        compras_curso = db.query(models.CompraCurso).filter(models.CompraCurso.pedido_id == pedido.id).all()
+        for compra in compras_curso:
+            compra.estado_pago = estado_traducido
+            compra.referencia_externa = str(payment_id)
 
     db.commit()
     return {"ok": True}

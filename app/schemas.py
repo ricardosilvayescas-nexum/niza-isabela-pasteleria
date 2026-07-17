@@ -97,10 +97,11 @@ class PedidoItemCreate(BaseModel):
 
 class PedidoCreate(BaseModel):
     sucursal_id: Optional[str] = None
-    tipo_entrega: str  # 'recoger' | 'delivery'
+    tipo_entrega: str  # 'recoger' | 'delivery' | 'digital'
     direccion_id: Optional[str] = None
     fecha_entrega: date
-    items: List[PedidoItemCreate]
+    items: List[PedidoItemCreate] = []
+    cursos: List[str] = []  # IDs de cursos incluidos en este pedido
 
 
 class PedidoOut(BaseModel):

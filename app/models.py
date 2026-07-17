@@ -152,6 +152,7 @@ class CompraCurso(Base):
     id = Column(UNIQUEIDENTIFIER(as_uuid=False), primary_key=True, default=gen_uuid)
     usuario_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("usuarios.id"), nullable=False)
     curso_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("cursos.id"), nullable=False)
+    pedido_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("pedidos.id"), nullable=True)
     monto = Column(Numeric(10, 2), nullable=False)
     estado_pago = Column(String(12), nullable=False, default="pendiente")
     referencia_externa = Column(String(150))

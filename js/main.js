@@ -21,11 +21,20 @@ function saveCart(cart) {
 
 function addToCart(item) {
   const cart = getCart();
-  const existente = cart.find(i => i.producto_id === item.producto_id && i.opcion_id === item.opcion_id);
-  if (existente) {
-    existente.cantidad += item.cantidad;
-  } else {
+  if (item.tipo === 'curso') {
+    const yaEsta = cart.find(i => i.tipo === 'curso' && i.curso_id === item.curso_id);
+    if (yaEsta) {
+      mostrarToastCarrito(`${item.nombre} ya está en tu carrito`);
+      return;
+    }
     cart.push(item);
+  } else {
+    const existente = cart.find(i => i.tipo !== 'curso' && i.producto_id === item.producto_id && i.opcion_id === item.opcion_id);
+    if (existente) {
+      existente.cantidad += item.cantidad;
+    } else {
+      cart.push(item);
+    }
   }
   saveCart(cart);
 }
@@ -67,16 +76,19 @@ function mostrarToastCarrito(nombre) {
 }
 
 function cartItemRowHTML(item, index) {
+  const esCurso = item.tipo === 'curso';
   return `
     <div class="sum-item" style="align-items:flex-start;">
       <div>
         <div style="font-weight:500; margin-bottom:4px;">${item.nombre}</div>
+        ${esCurso ? '<span class="cart-item-size">📄 Curso digital</span>' : ''}
         ${item.opcion_nombre ? `<span class="cart-item-size">${item.opcion_nombre}</span>` : ''}
+        ${esCurso ? '' : `
         <div class="cart-item-qty-row">
           <button type="button" class="cart-qty-btn" onclick="cambiarCantidadCarrito(${index}, -1)">−</button>
           <span class="cart-qty-value">${item.cantidad}</span>
           <button type="button" class="cart-qty-btn" onclick="cambiarCantidadCarrito(${index}, 1)">+</button>
-        </div>
+        </div>`}
       </div>
       <div style="text-align:right;">
         <div style="font-weight:600;">$${(item.precio_unitario * item.cantidad).toFixed(0)} MXN</div>
@@ -96,6 +108,25 @@ function renderCheckoutCart() {
   }
   const totalEl = document.getElementById('checkout-total');
   if (totalEl) totalEl.textContent = `$${getCartTotal().toFixed(0)} MXN`;
+  actualizarPanelesCheckout(cart);
+}
+
+function actualizarPanelesCheckout(cart) {
+  const panelFisico = document.getElementById('panel-entrega-fisica');
+  const panelDigital = document.getElementById('panel-cursos-digital');
+  if (!panelFisico || !panelDigital) return;
+
+  const productos = cart.filter(function (item) { return item.tipo !== 'curso'; });
+  const cursos = cart.filter(function (item) { return item.tipo === 'curso'; });
+
+  panelFisico.style.display = productos.length ? 'block' : 'none';
+  panelDigital.style.display = cursos.length ? 'block' : 'none';
+
+  const nota = document.getElementById('cursos-digital-nota');
+  if (nota && cursos.length) {
+    const nombres = cursos.map(function (c) { return `"${c.nombre}"`; }).join(', ');
+    nota.textContent = `📄 ${nombres} no requiere${cursos.length > 1 ? 'n' : ''} sucursal ni fecha — el acceso se activa automáticamente al confirmar el pago, en "Mis cursos" y por correo.`;
+  }
 }
 
 function cambiarCantidadCarrito(index, delta) {
@@ -238,6 +269,7 @@ function courseCardHTML(c) {
       <a class="link" href="#" data-courseview
          data-title="${c.nombre}"
          data-price="${c.tiene_descuento ? '$' + Number(c.precio_final).toFixed(0) + ' MXN (antes $' + Number(c.precio_original).toFixed(0) + ')' : '$' + Number(c.precio_final).toFixed(0) + ' MXN'}"
+         data-price-num="${c.precio_final}"
          data-desc="${c.descripcion || ''}"
          data-photo="${c.portada_url || ''}"
          data-id="${c.id}">Ver más →</a>
@@ -406,17 +438,26 @@ async function crearPedidoDesdeCarrito() {
   const cart = getCart();
   if (!cart.length) { alert('Tu carrito está vacío.'); return; }
 
-  const tipoEntregaEl = document.querySelector('#tipo-entrega-options .opt.selected');
-  const tipoEntrega = tipoEntregaEl ? tipoEntregaEl.dataset.entrega : 'recoger';
-  const fechaEntrega = document.getElementById('checkout-fecha').value;
+  const productos = cart.filter(function (item) { return item.tipo !== 'curso'; });
+  const cursos = cart.filter(function (item) { return item.tipo === 'curso'; });
+  const soloDigital = productos.length === 0;
 
-  if (!fechaEntrega) { alert('Selecciona una fecha de entrega.'); return; }
-
+  let tipoEntrega = 'digital';
   let sucursalId = null;
-  if (tipoEntrega === 'recoger') {
-    const filaSel = document.querySelector('#checkout-sucursal-rows .sucursal-row.sel');
-    sucursalId = filaSel ? filaSel.dataset.id : null;
-    if (!sucursalId) { alert('Selecciona una sucursal.'); return; }
+  let fechaEntrega = new Date().toISOString().slice(0, 10); // fecha_entrega es obligatoria en el modelo, aunque sea pedido digital
+
+  if (!soloDigital) {
+    const tipoEntregaEl = document.querySelector('#tipo-entrega-options .opt.selected');
+    tipoEntrega = tipoEntregaEl ? tipoEntregaEl.dataset.entrega : 'recoger';
+    fechaEntrega = document.getElementById('checkout-fecha').value;
+
+    if (!fechaEntrega) { alert('Selecciona una fecha de entrega.'); return; }
+
+    if (tipoEntrega === 'recoger') {
+      const filaSel = document.querySelector('#checkout-sucursal-rows .sucursal-row.sel');
+      sucursalId = filaSel ? filaSel.dataset.id : null;
+      if (!sucursalId) { alert('Selecciona una sucursal.'); return; }
+    }
   }
 
   const datos = {
@@ -424,7 +465,7 @@ async function crearPedidoDesdeCarrito() {
     tipo_entrega: tipoEntrega,
     direccion_id: null,
     fecha_entrega: fechaEntrega,
-    items: cart.map(function (item) {
+    items: productos.map(function (item) {
       return {
         producto_id: item.producto_id,
         opcion_id: item.opcion_id || null,
@@ -432,6 +473,7 @@ async function crearPedidoDesdeCarrito() {
         precio_unitario: item.precio_unitario,
       };
     }),
+    cursos: cursos.map(function (item) { return item.curso_id; }),
   };
 
   const boton = document.getElementById('btn-pagar');
@@ -619,7 +661,9 @@ function wireCourseViewLinks() {
         cvPhoto.style.backgroundImage = '';
         cvPhoto.textContent = 'Portada';
       }
-      document.getElementById('cvBuyLink').href = 'checkout.html?curso=' + link.dataset.id;
+      courseView.dataset.cursoId = link.dataset.id;
+      courseView.dataset.nombre = link.dataset.title;
+      courseView.dataset.precioNum = link.dataset.priceNum;
       courseView.classList.add('open');
     });
   });
@@ -693,6 +737,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
       quickView.classList.remove('open');
       mostrarToastCarrito(quickView.dataset.nombre);
+    });
+  }
+
+  var cvAddBtn = document.getElementById('cvAddToCart');
+  if (cvAddBtn) {
+    cvAddBtn.addEventListener('click', function () {
+      var courseView = document.getElementById('courseView');
+      addToCart({
+        tipo: 'curso',
+        curso_id: courseView.dataset.cursoId,
+        nombre: courseView.dataset.nombre,
+        precio_unitario: parseFloat(courseView.dataset.precioNum),
+        cantidad: 1,
+      });
+      courseView.classList.remove('open');
+      mostrarToastCarrito(courseView.dataset.nombre);
     });
   }
 

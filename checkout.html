@@ -25,28 +25,28 @@
 
 <div class="layout-2col">
   <div>
-    <div class="panel">
-      <h3>Pastel de catálogo — método de recepción</h3>
-      <div class="options" style="margin-bottom:18px;" id="tipo-entrega-options">
-        <div class="opt selected" data-entrega="recoger">Recoger en sucursal</div>
-        <div class="opt" data-entrega="delivery">Delivery</div>
+      <div class="panel" id="panel-entrega-fisica">
+        <h3>Pastel de catálogo — método de recepción</h3>
+        <div class="options" style="margin-bottom:18px;" id="tipo-entrega-options">
+          <div class="opt selected" data-entrega="recoger">Recoger en sucursal</div>
+          <div class="opt" data-entrega="delivery">Delivery</div>
+        </div>
+        <div id="checkout-sucursal-rows">
+          <p style="color:var(--grey); font-size:13px;">Cargando sucursales…</p>
+        </div>
+        <label class="small" style="margin-top:16px; display:block;">Fecha de recolección</label>
+        <input type="date" id="checkout-fecha">
+        <div id="delivery-direccion-wrap" style="display:none; margin-top:16px;">
+          <label class="small">Dirección de entrega</label>
+          <textarea id="checkout-direccion" placeholder="Calle, número, colonia, referencias..."></textarea>
+        </div>
       </div>
-      <div id="checkout-sucursal-rows">
-        <p style="color:var(--grey); font-size:13px;">Cargando sucursales…</p>
-      </div>
-      <label class="small" style="margin-top:16px; display:block;">Fecha de recolección</label>
-      <input type="date" id="checkout-fecha">
-      <div id="delivery-direccion-wrap" style="display:none; margin-top:16px;">
-        <label class="small">Dirección de entrega</label>
-        <textarea id="checkout-direccion" placeholder="Calle, número, colonia, referencias..."></textarea>
-      </div>
-    </div>
 
-    <div class="panel">
-      <h3>Curso digital — sin entrega física</h3>
-      <div class="digital-note">📄 "Fundamentos de Repostería Francesa" no requiere sucursal ni fecha — el acceso se activa automáticamente al confirmar el pago, en "Mis cursos" y por correo.</div>
+      <div class="panel" id="panel-cursos-digital" style="display:none;">
+        <h3>Cursos digitales — sin entrega física</h3>
+        <div class="digital-note" id="cursos-digital-nota">📄 No requieren sucursal ni fecha — el acceso se activa automáticamente al confirmar el pago, en "Mis cursos" y por correo.</div>
+      </div>
     </div>
-  </div>
 
   <div class="panel">
     <h3>Resumen del pedido</h3>

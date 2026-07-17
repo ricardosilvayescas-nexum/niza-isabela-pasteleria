@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from .. import models, schemas, security
 from ..database import get_db
+from .cursos import calcular_precio_curso
 from ..utils.correo import (
     enviar_correo,
     correo_confirmacion_pedido,
@@ -27,6 +28,15 @@ def crear_pedido(
     nunca del usuario_id que venga en el body (evita que alguien haga pedidos a nombre de otro)."""
     total = sum(item.precio_unitario * item.cantidad for item in datos.items)
 
+    cursos_info = []
+    for curso_id in datos.cursos:
+        curso = db.query(models.Curso).filter(models.Curso.id == curso_id).first()
+        if not curso:
+            raise HTTPException(status_code=404, detail=f"Curso {curso_id} no encontrado")
+        precio_curso = calcular_precio_curso(curso).precio_final
+        total += precio_curso
+        cursos_info.append((curso, precio_curso))
+
     pedido = models.Pedido(
         usuario_id=usuario_actual.id,
         sucursal_id=datos.sucursal_id,
@@ -46,6 +56,15 @@ def crear_pedido(
             opcion_id=item.opcion_id,
             cantidad=item.cantidad,
             precio_unitario=item.precio_unitario,
+        ))
+
+    for curso, precio_curso in cursos_info:
+        db.add(models.CompraCurso(
+            pedido_id=pedido.id,
+            usuario_id=usuario_actual.id,
+            curso_id=curso.id,
+            monto=precio_curso,
+            estado_pago="pendiente",
         ))
 
     db.commit()
@@ -152,6 +171,12 @@ def listar_pedidos_admin(
             producto = db.query(models.Producto).filter(models.Producto.id == item.producto_id).first()
             if producto:
                 nombres_productos.append(f"{producto.nombre} x{item.cantidad}")
+
+        compras_curso = db.query(models.CompraCurso).filter(models.CompraCurso.pedido_id == p.id).all()
+        for compra in compras_curso:
+            curso = db.query(models.Curso).filter(models.Curso.id == compra.curso_id).first()
+            if curso:
+                nombres_productos.append(f"{curso.nombre} (curso)")
 
         resultado.append(schemas.PedidoAdminOut(
             id=p.id,
