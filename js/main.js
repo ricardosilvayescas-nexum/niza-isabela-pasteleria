@@ -6,7 +6,7 @@
 /* ---------- Conexión con el backend ----------
    Cambia esta URL cuando despliegues el backend en Azure
    (ej. https://niza-isabela-api.azurewebsites.net) */
-const API_BASE_URL = 'http://192.168.1.89:8000';
+const API_BASE_URL = 'https://niza-isabela-api-c9d8a3ghbddqe3hr.centralus-01.azurewebsites.net';
 /* ---------- Carrito de compras (localStorage) ---------- */
 const CART_KEY = 'niza_carrito';
 
