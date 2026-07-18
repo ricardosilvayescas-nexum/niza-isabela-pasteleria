@@ -44,7 +44,7 @@ class CursoOut(BaseModel):
 # ---------- Cotizaciones ----------
 class CotizacionCreate(BaseModel):
     nombre_cliente: str
-    producto_id: str
+    producto_id: Optional[str] = None
     sucursal_id: str
     tamano: Optional[str] = None
     sabor: Optional[str] = None

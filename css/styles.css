@@ -333,11 +333,16 @@ input[type=date]::-webkit-calendar-picker-indicator{
 }
 
 input[type=text]:focus, input[type=date]:focus, input[type=email]:focus,
-input[type=tel]:focus, select:focus, textarea:focus{
+input[type=tel]:focus, input[type=password]:focus, select:focus, textarea:focus{
   outline:none; border-color:var(--accent-deep);
 }
 
 input[type=number]{
+  width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:6px;
+  font-family:'Inter'; font-size:13.5px; color:var(--ink); background:#fff;
+}
+
+input[type=password]{
   width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:6px;
   font-family:'Inter'; font-size:13.5px; color:var(--ink); background:#fff;
 }
