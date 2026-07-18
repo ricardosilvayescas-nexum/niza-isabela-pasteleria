@@ -60,7 +60,7 @@ class CotizacionCreate(BaseModel):
 class CotizacionOut(BaseModel):
     id: str
     nombre_cliente: Optional[str] = None
-    producto_id: str
+    producto_id: Optional[str] = None
     sucursal_id: str
     tamano: Optional[str] = None
     sabor: Optional[str] = None
