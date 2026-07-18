@@ -378,6 +378,7 @@ function wireContactoForm() {
     var datos = {
       nombre: document.getElementById('contacto-nombre').value,
       correo: document.getElementById('contacto-correo').value,
+      telefono: document.getElementById('contacto-telefono').value || null,
       mensaje: document.getElementById('contacto-mensaje').value,
     };
 

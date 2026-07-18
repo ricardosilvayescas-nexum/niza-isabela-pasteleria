@@ -65,6 +65,12 @@
   const ESTADOS = ['recibido', 'en_produccion', 'listo', 'entregado'];
   const ESTADO_LABEL = { recibido: 'Recibido', en_produccion: 'En producción', listo: 'Listo', entregado: 'Entregado' };
 
+function claseEstadoPedido(estado) {
+    if (estado === 'entregado') return 'st-verde';
+    if (estado === 'listo') return 'st-amarillo';
+    return 'st-rojo'; // recibido, en_produccion
+  }
+
   function pedidoRowHTML(p, mapaSucursales) {
     const opciones = ESTADOS.map(e => `<option value="${e}" ${e === p.estado ? 'selected' : ''}>${ESTADO_LABEL[e]}</option>`).join('');
     return `
@@ -75,7 +81,7 @@
         <td>${p.sucursal_id ? (mapaSucursales[p.sucursal_id] || '—') : '—'}</td>
         <td>${p.tipo_entrega === 'recoger' || p.tipo_entrega === 'delivery' ? new Date(p.fecha_entrega).toLocaleDateString('es-MX') : 'Digital'}</td>
         <td>$${p.total.toFixed(0)}</td>
-        <td><select class="status-select" onchange="cambiarEstadoPedido('${p.id}', this.value)">${opciones}</select></td>
+        <td><select class="status-select ${claseEstadoPedido(p.estado)}" onchange="cambiarEstadoPedido('${p.id}', this.value, this)">${opciones}</select></td>
       </tr>`;
   }
 
@@ -112,8 +118,12 @@
     }
   }
 
-  async function cambiarEstadoPedido(id, nuevoEstado) {
+  async function cambiarEstadoPedido(id, nuevoEstado, selectEl) {
     await authFetch(`${API_BASE_URL}/api/pedidos/${id}/estado?nuevo_estado=${nuevoEstado}`, { method: 'PATCH' });
+    if (selectEl) {
+      selectEl.classList.remove('st-rojo', 'st-amarillo', 'st-verde');
+      selectEl.classList.add(claseEstadoPedido(nuevoEstado));
+    }
   }
 
   document.getElementById('filtro-sucursal').addEventListener('change', cargarPedidosAdmin);

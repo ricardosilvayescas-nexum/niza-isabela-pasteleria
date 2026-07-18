@@ -164,6 +164,7 @@ class ContactoMensaje(Base):
     contacto_mensaje_id = Column("ContactoMensajeID", UNIQUEIDENTIFIER(as_uuid=False), primary_key=True, default=gen_uuid)
     nombre = Column("Nombre", String(150), nullable=False)
     correo = Column("Correo", String(150), nullable=False)
+    telefono = Column("Telefono", String(20), nullable=True)
     mensaje = Column("Mensaje", String, nullable=False)
     fecha_envio = Column("FechaEnvio", DateTime, server_default=func.now())
     leido = Column("Leido", Boolean, default=False)

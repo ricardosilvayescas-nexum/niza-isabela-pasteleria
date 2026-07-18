@@ -116,6 +116,7 @@ class PedidoOut(BaseModel):
 class ContactoMensajeCreate(BaseModel):
     nombre: str
     correo: EmailStr
+    telefono: Optional[str] = None
     mensaje: str
 
 
@@ -123,6 +124,7 @@ class ContactoMensajeOut(BaseModel):
     contacto_mensaje_id: str
     nombre: str
     correo: str
+    telefono: Optional[str] = None
     mensaje: str
     fecha_envio: datetime
     leido: bool

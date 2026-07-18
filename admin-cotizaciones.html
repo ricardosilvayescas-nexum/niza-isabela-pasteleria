@@ -91,7 +91,7 @@
             ? `<a class="wa-mini" href="${waLink}" target="_blank" rel="noopener">💬 Contactar por WhatsApp →</a>`
             : `<span class="wa-mini" style="color:var(--grey);">Sin teléfono registrado</span>`}
         </div>
-        <select class="status-select" onchange="cambiarEstado('${c.id}', this.value)">
+        <select class="status-select ${claseEstadoCotizacion(c.estado)}" onchange="cambiarEstado('${c.id}', this.value, this)">
           <option value="nueva" ${c.estado === 'nueva' ? 'selected' : ''}>Nueva</option>
           <option value="contactada" ${c.estado === 'contactada' ? 'selected' : ''}>Contactada</option>
           <option value="cerrada" ${c.estado === 'cerrada' ? 'selected' : ''}>Cerrada</option>
@@ -115,8 +115,18 @@
     }
   }
 
-  async function cambiarEstado(id, nuevoEstado) {
+  function claseEstadoCotizacion(estado) {
+    if (estado === 'cerrada') return 'st-verde';
+    if (estado === 'contactada') return 'st-amarillo';
+    return 'st-rojo'; // nueva
+  }
+
+  async function cambiarEstado(id, nuevoEstado, selectEl) {
     await authFetch(`${API_BASE_URL}/api/cotizaciones/${id}/estado?nuevo_estado=${nuevoEstado}`, { method: 'PATCH' });
+    if (selectEl) {
+      selectEl.classList.remove('st-rojo', 'st-amarillo', 'st-verde');
+      selectEl.classList.add(claseEstadoCotizacion(nuevoEstado));
+    }
   }
 
   function abrirLightbox(url) {

@@ -35,7 +35,7 @@
 
     <div class="admin-panel">
       <table class="admin-table" id="dudas-table">
-        <tr><th>Nombre</th><th>Correo</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th></th></tr>
+        <tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th></th></tr>
       </table>
     </div>
   </div>
@@ -51,11 +51,12 @@
       const res = await authFetch(`${API_BASE_URL}/contacto/admin`);
       if (!res.ok) throw new Error();
       const dudas = await res.json();
-      tabla.innerHTML = '<tr><th>Nombre</th><th>Correo</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th></th></tr>' +
+      tabla.innerHTML = '<tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Mensaje</th><th>Fecha</th><th>Estado</th><th></th></tr>' +
         dudas.map(d => `
           <tr>
             <td>${d.nombre}</td>
             <td>${d.correo}</td>
+            <td>${d.telefono || '—'}</td>
             <td>${d.mensaje}</td>
             <td>${new Date(d.fecha_envio).toLocaleDateString('es-MX')}</td>
             <td><span class="status ${d.leido ? 'entregado' : 'produccion'}">${d.leido ? 'Leído' : 'Nuevo'}</span></td>
