@@ -180,14 +180,17 @@ def listar_pedidos_admin(
 
         if p.descripcion_manual:
             nombre_cliente = p.cliente_nombre_manual or "Cliente"
+            telefono_cliente = p.cliente_telefono_manual
             productos_texto = p.descripcion_manual
         else:
             nombre_cliente = usuario.nombre if usuario else "Cliente desconocido"
+            telefono_cliente = usuario.telefono if usuario else None
             productos_texto = ", ".join(nombres_productos) if nombres_productos else "—"
 
         resultado.append(schemas.PedidoAdminOut(
             id=p.id,
             cliente_nombre=nombre_cliente,
+            cliente_telefono=telefono_cliente,
             productos=productos_texto,
             sucursal_id=p.sucursal_id,
             tipo_entrega=p.tipo_entrega,
@@ -225,6 +228,7 @@ def crear_pedido_manual(
     return schemas.PedidoAdminOut(
         id=pedido.id,
         cliente_nombre=pedido.cliente_nombre_manual,
+        cliente_telefono=pedido.cliente_telefono_manual,
         productos=pedido.descripcion_manual,
         sucursal_id=pedido.sucursal_id,
         tipo_entrega=pedido.tipo_entrega,

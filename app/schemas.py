@@ -89,6 +89,7 @@ class PedidoManualCreate(BaseModel):
 class PedidoAdminOut(BaseModel):
     id: str
     cliente_nombre: str
+    cliente_telefono: Optional[str] = None
     productos: str
     sucursal_id: Optional[str] = None
     tipo_entrega: str

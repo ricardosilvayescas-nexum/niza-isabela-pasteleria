@@ -511,3 +511,32 @@ nav.site-nav.scrolled{
 .status-select.st-rojo{ background:#F7E3DE; color:#A0522D; border-color:#A0522D; font-weight:600; }
 .status-select.st-amarillo{ background:var(--gold); color:#7A5A16; border-color:#7A5A16; font-weight:600; }
 .status-select.st-verde{ background:#DCE9D5; color:#43653A; border-color:#43653A; font-weight:600; }
+
+
+
+/* ===== DETALLE DE PEDIDO (secciones separadas) ===== */
+.detalle-row{
+  padding:16px 0; border-bottom:1px solid var(--line);
+}
+.detalle-row:last-child{ border-bottom:none; padding-bottom:0; }
+.detalle-label{
+  font-size:11px; text-transform:uppercase; letter-spacing:.03em;
+  color:var(--accent-deep); font-weight:600; margin-bottom:8px;
+}
+.detalle-valor{
+  font-size:14px; color:var(--ink); line-height:1.7; white-space:pre-line;
+}
+.detalle-valor.total{ font-size:20px; font-weight:600; color:var(--accent-deep); }
+
+
+
+/* ===== BOTÓN MINI (compartido en todo el admin) ===== */
+.btn-mini{
+  font-size:12px; padding:7px 14px; border:1px solid var(--line);
+  border-radius:6px; background:#fff; cursor:pointer;
+  font-family:'Inter'; color:var(--ink);
+  transition:border-color .2s ease, color .2s ease, background .2s ease;
+}
+.btn-mini:hover{
+  border-color:var(--accent-deep); color:var(--accent-deep); background:var(--blush);
+}

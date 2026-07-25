@@ -13,6 +13,7 @@
   .toolbar{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
   .toolbar select{ width:auto; padding:8px 14px; font-size:12.5px; border-radius:20px; }
   .status-select{ font-size:11.5px; padding:5px 10px; border-radius:12px; border:1px solid var(--line); background:#fff; }
+  table.admin-table td:last-child{ padding-left:16px; }
 </style>
 </head>
 <body style="background-color:#FFFDEE;">
@@ -52,7 +53,7 @@
 
     <div class="admin-panel">
       <table class="admin-table" id="pedidos-table">
-        <tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th></tr>
+        <tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th><th></th></tr>
       </table>
     </div>
   </div>
@@ -88,6 +89,38 @@
   </div>
 </div>
 
+<!-- MODAL DETALLE DE PEDIDO -->
+<div class="modal-overlay" id="pedido-detalle-modal">
+  <div class="modal" style="grid-template-columns:1fr; max-width:520px;">
+    <button class="modal-close" onclick="cerrarModalDetallePedido()">✕</button>
+    <div class="modal-body">
+      <h3 style="margin-bottom:4px;">Detalle del pedido</h3>
+      <div style="font-size:13px; color:var(--grey); margin-bottom:8px;" id="pd-meta"></div>
+
+      <div class="detalle-row">
+        <div class="detalle-label">Cliente</div>
+        <div class="detalle-valor" id="pd-cliente"></div>
+      </div>
+      <div class="detalle-row">
+        <div class="detalle-label">Teléfono</div>
+        <div class="detalle-valor" id="pd-telefono"></div>
+      </div>
+      <div class="detalle-row">
+        <div class="detalle-label">Detalle / productos</div>
+        <div class="detalle-valor" id="pd-productos"></div>
+      </div>
+      <div class="detalle-row">
+        <div class="detalle-label">Entrega</div>
+        <div class="detalle-valor" id="pd-entrega"></div>
+      </div>
+      <div class="detalle-row">
+        <div class="detalle-label">Total</div>
+        <div class="detalle-valor total" id="pd-total"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="js/main.js"></script>
 <script src="js/animations.js"></script>
 <script>requireAdmin();</script>
@@ -101,18 +134,44 @@ function claseEstadoPedido(estado) {
     return 'st-rojo'; // recibido, en_produccion
   }
 
+  let pedidosCache = [];
+  let mapaSucursalesCache = {};
+
   function pedidoRowHTML(p, mapaSucursales) {
     const opciones = ESTADOS.map(e => `<option value="${e}" ${e === p.estado ? 'selected' : ''}>${ESTADO_LABEL[e]}</option>`).join('');
     return `
       <tr>
         <td>#${p.id.slice(0, 8)}</td>
         <td>${p.cliente_nombre}</td>
-        <td>${p.productos}</td>
+        <td>${p.productos.length > 40 ? p.productos.slice(0, 40) + '…' : p.productos}</td>
         <td>${p.sucursal_id ? (mapaSucursales[p.sucursal_id] || '—') : '—'}</td>
         <td>${p.tipo_entrega === 'recoger' || p.tipo_entrega === 'delivery' ? new Date(p.fecha_entrega).toLocaleDateString('es-MX') : 'Digital'}</td>
         <td>$${p.total.toFixed(0)}</td>
         <td><select class="status-select ${claseEstadoPedido(p.estado)}" onchange="cambiarEstadoPedido('${p.id}', this.value, this)">${opciones}</select></td>
+        <td><button class="btn-mini" onclick="verDetallePedido('${p.id}')">Ver detalle</button></td>
       </tr>`;
+  }
+
+  function verDetallePedido(id) {
+    const p = pedidosCache.find(x => x.id === id);
+    if (!p) return;
+    const sucursalNombre = p.sucursal_id ? (mapaSucursalesCache[p.sucursal_id] || '—') : '—';
+    const entregaTexto = p.tipo_entrega === 'digital'
+      ? 'Digital (curso)'
+      : `${p.tipo_entrega === 'recoger' ? 'Recoger en ' + sucursalNombre : 'Delivery'} — ${new Date(p.fecha_entrega).toLocaleDateString('es-MX')}`;
+
+    document.getElementById('pd-meta').textContent = `Pedido #${p.id.slice(0, 8)} · ${new Date(p.created_at).toLocaleDateString('es-MX')}`;
+    document.getElementById('pd-cliente').textContent = p.cliente_nombre;
+    document.getElementById('pd-telefono').textContent = p.cliente_telefono || 'No registrado';
+    document.getElementById('pd-productos').textContent = p.productos;
+    document.getElementById('pd-entrega').textContent = entregaTexto;
+    document.getElementById('pd-total').textContent = `$${p.total.toFixed(0)} MXN`;
+
+    document.getElementById('pedido-detalle-modal').classList.add('open');
+  }
+
+  function cerrarModalDetallePedido() {
+    document.getElementById('pedido-detalle-modal').classList.remove('open');
   }
 
   async function cargarPedidosAdmin() {
@@ -129,9 +188,11 @@ function claseEstadoPedido(estado) {
         authFetch(`${API_BASE_URL}/api/pedidos/admin/completo?${params}`).then(r => r.json()),
         fetchSucursales(),
       ]);
+      pedidosCache = pedidos;
       const mapaSucursales = Object.fromEntries(sucursales.map(s => [s.id, s.nombre]));
+      mapaSucursalesCache = mapaSucursales;
 
-      tabla.innerHTML = '<tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th></tr>' +
+      tabla.innerHTML = '<tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th><th></th></tr>' +
         (pedidos.length ? pedidos.map(p => pedidoRowHTML(p, mapaSucursales)).join('') : '<tr><td colspan="7" style="text-align:center; color:var(--grey);">No hay pedidos todavía.</td></tr>');
 
       // Llenar el select de sucursales solo la primera vez
