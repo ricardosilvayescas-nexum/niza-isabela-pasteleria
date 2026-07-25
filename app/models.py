@@ -72,14 +72,17 @@ class Direccion(Base):
 class Pedido(Base):
     __tablename__ = "pedidos"
     id = Column(UNIQUEIDENTIFIER(as_uuid=False), primary_key=True, default=gen_uuid)
-    usuario_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("usuarios.id"))
+    usuario_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("usuarios.id"), nullable=True)
     sucursal_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("sucursales.id"))
-    tipo_entrega = Column(String(10), nullable=False)  # recoger | delivery
+    tipo_entrega = Column(String(10), nullable=False)  # recoger | delivery | digital
     direccion_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("direcciones.id"))
     fecha_entrega = Column(Date, nullable=False)
     estado = Column(String(15), nullable=False, default="recibido")
     total = Column(Numeric(10, 2), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+    cliente_nombre_manual = Column(String(150), nullable=True)
+    cliente_telefono_manual = Column(String(20), nullable=True)
+    descripcion_manual = Column(String, nullable=True)
     items = relationship("PedidoItem", back_populates="pedido")
 
 

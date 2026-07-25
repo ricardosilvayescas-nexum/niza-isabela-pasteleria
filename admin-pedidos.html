@@ -36,7 +36,7 @@
   <div class="admin-main">
     <div class="topbar">
       <h1>Pedidos</h1>
-      <div class="period">+ Nuevo pedido manual</div>
+      <div class="period" style="cursor:pointer;" onclick="abrirModalPedidoManual()">+ Nuevo pedido manual</div>
     </div>
 
     <div class="toolbar">
@@ -54,6 +54,36 @@
       <table class="admin-table" id="pedidos-table">
         <tr><th>Pedido</th><th>Cliente</th><th>Producto</th><th>Sucursal</th><th>Entrega</th><th>Total</th><th>Estado</th></tr>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PEDIDO MANUAL -->
+<div class="modal-overlay" id="pedido-manual-modal">
+  <div class="modal" style="grid-template-columns:1fr; max-width:520px;">
+    <button class="modal-close" onclick="cerrarModalPedidoManual()">✕</button>
+    <div class="modal-body">
+      <h3>Nuevo pedido manual</h3>
+      <label class="small">Nombre del cliente</label>
+      <input type="text" id="pm-nombre" style="margin-bottom:14px;">
+      <label class="small">Teléfono (opcional)</label>
+      <input type="tel" id="pm-telefono" style="margin-bottom:14px;">
+      <label class="small">Descripción del pedido</label>
+      <textarea id="pm-descripcion" placeholder="Ej. Pastel 3 pisos, chocolate y vainilla, tema safari, para 40 personas" style="margin-bottom:14px;"></textarea>
+      <label class="small">Método de entrega</label>
+      <select id="pm-entrega" style="margin-bottom:14px;">
+        <option value="recoger">Recoger en sucursal</option>
+        <option value="delivery">Delivery</option>
+      </select>
+      <div id="pm-sucursal-wrap" style="margin-bottom:14px;">
+        <label class="small">Sucursal</label>
+        <select id="pm-sucursal"><option value="">Cargando…</option></select>
+      </div>
+      <label class="small">Fecha de entrega</label>
+      <input type="date" id="pm-fecha" style="margin-bottom:14px;">
+      <label class="small">Total acordado (MXN)</label>
+      <input type="number" id="pm-total" style="margin-bottom:20px;">
+      <button class="btn btn-primary btn-block" onclick="guardarPedidoManual()">Guardar pedido</button>
     </div>
   </div>
 </div>
@@ -115,6 +145,67 @@ function claseEstadoPedido(estado) {
       }
     } catch {
       tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey);">No se pudieron cargar los pedidos.</td></tr>';
+    }
+  }
+
+  async function abrirModalPedidoManual() {
+    document.getElementById('pm-nombre').value = '';
+    document.getElementById('pm-telefono').value = '';
+    document.getElementById('pm-descripcion').value = '';
+    document.getElementById('pm-entrega').value = 'recoger';
+    document.getElementById('pm-fecha').value = '';
+    document.getElementById('pm-total').value = '';
+
+    const select = document.getElementById('pm-sucursal');
+    if (select.options.length <= 1) {
+      const sucursales = await fetchSucursales();
+      select.innerHTML = sucursales.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+    }
+
+    document.getElementById('pedido-manual-modal').classList.add('open');
+  }
+
+  function cerrarModalPedidoManual() {
+    document.getElementById('pedido-manual-modal').classList.remove('open');
+  }
+
+  document.getElementById('pm-entrega').addEventListener('change', function () {
+    document.getElementById('pm-sucursal-wrap').style.display = this.value === 'recoger' ? 'block' : 'none';
+  });
+
+  async function guardarPedidoManual() {
+    const nombre = document.getElementById('pm-nombre').value.trim();
+    const descripcion = document.getElementById('pm-descripcion').value.trim();
+    const fecha = document.getElementById('pm-fecha').value;
+    const total = parseFloat(document.getElementById('pm-total').value);
+    const tipoEntrega = document.getElementById('pm-entrega').value;
+
+    if (!nombre || !descripcion || !fecha || !total) {
+      alert('Completa nombre, descripción, fecha y total.');
+      return;
+    }
+
+    const datos = {
+      cliente_nombre: nombre,
+      cliente_telefono: document.getElementById('pm-telefono').value.trim() || null,
+      sucursal_id: tipoEntrega === 'recoger' ? document.getElementById('pm-sucursal').value : null,
+      tipo_entrega: tipoEntrega,
+      fecha_entrega: fecha,
+      descripcion: descripcion,
+      total: total,
+    };
+
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/pedidos/admin/manual`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!res.ok) throw new Error();
+      cerrarModalPedidoManual();
+      cargarPedidosAdmin();
+    } catch {
+      alert('Hubo un error al guardar el pedido.');
     }
   }
 

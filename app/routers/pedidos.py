@@ -164,7 +164,7 @@ def listar_pedidos_admin(
 
     resultado = []
     for p in pedidos:
-        usuario = db.query(models.Usuario).filter(models.Usuario.id == p.usuario_id).first()
+        usuario = db.query(models.Usuario).filter(models.Usuario.id == p.usuario_id).first() if p.usuario_id else None
         items = db.query(models.PedidoItem).filter(models.PedidoItem.pedido_id == p.id).all()
         nombres_productos = []
         for item in items:
@@ -178,10 +178,17 @@ def listar_pedidos_admin(
             if curso:
                 nombres_productos.append(f"{curso.nombre} (curso)")
 
+        if p.descripcion_manual:
+            nombre_cliente = p.cliente_nombre_manual or "Cliente"
+            productos_texto = p.descripcion_manual
+        else:
+            nombre_cliente = usuario.nombre if usuario else "Cliente desconocido"
+            productos_texto = ", ".join(nombres_productos) if nombres_productos else "—"
+
         resultado.append(schemas.PedidoAdminOut(
             id=p.id,
-            cliente_nombre=usuario.nombre if usuario else "Cliente desconocido",
-            productos=", ".join(nombres_productos) if nombres_productos else "—",
+            cliente_nombre=nombre_cliente,
+            productos=productos_texto,
             sucursal_id=p.sucursal_id,
             tipo_entrega=p.tipo_entrega,
             fecha_entrega=p.fecha_entrega,
@@ -190,3 +197,39 @@ def listar_pedidos_admin(
             created_at=p.created_at,
         ))
     return resultado
+
+
+@router.post("/admin/manual", response_model=schemas.PedidoAdminOut)
+def crear_pedido_manual(
+    datos: schemas.PedidoManualCreate,
+    db: Session = Depends(get_db),
+    _admin: models.Usuario = Depends(security.get_current_admin),
+):
+    """Solo admin — registra un pedido personalizado (transferencia manual),
+    normalmente después de coordinar los detalles por WhatsApp vía cotización."""
+    pedido = models.Pedido(
+        usuario_id=None,
+        sucursal_id=datos.sucursal_id,
+        tipo_entrega=datos.tipo_entrega,
+        fecha_entrega=datos.fecha_entrega,
+        estado="recibido",
+        total=datos.total,
+        cliente_nombre_manual=datos.cliente_nombre,
+        cliente_telefono_manual=datos.cliente_telefono,
+        descripcion_manual=datos.descripcion,
+    )
+    db.add(pedido)
+    db.commit()
+    db.refresh(pedido)
+
+    return schemas.PedidoAdminOut(
+        id=pedido.id,
+        cliente_nombre=pedido.cliente_nombre_manual,
+        productos=pedido.descripcion_manual,
+        sucursal_id=pedido.sucursal_id,
+        tipo_entrega=pedido.tipo_entrega,
+        fecha_entrega=pedido.fecha_entrega,
+        total=float(pedido.total),
+        estado=pedido.estado,
+        created_at=pedido.created_at,
+    )

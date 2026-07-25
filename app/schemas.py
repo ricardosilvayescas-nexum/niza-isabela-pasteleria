@@ -77,6 +77,15 @@ class CotizacionOut(BaseModel):
 
 
 # ---------- Pedidos ----------
+class PedidoManualCreate(BaseModel):
+    cliente_nombre: str
+    cliente_telefono: Optional[str] = None
+    sucursal_id: Optional[str] = None
+    tipo_entrega: str  # recoger | delivery
+    fecha_entrega: date
+    descripcion: str
+    total: float
+
 class PedidoAdminOut(BaseModel):
     id: str
     cliente_nombre: str
