@@ -86,6 +86,20 @@ def crear_cotizacion(
     return nueva
 
 
+@router.get("/mias", response_model=List[schemas.CotizacionOut])
+def mis_cotizaciones(
+    db: Session = Depends(get_db),
+    usuario_actual: models.Usuario = Depends(security.get_current_user),
+):
+    """Cotizaciones del cliente logueado — para la sección 'Mis cotizaciones' de su cuenta."""
+    return (
+        db.query(models.Cotizacion)
+        .filter(models.Cotizacion.usuario_id == usuario_actual.id)
+        .order_by(models.Cotizacion.created_at.desc())
+        .all()
+    )
+
+
 @router.get("/", response_model=List[schemas.CotizacionOut])
 def listar_cotizaciones(
     estado: str | None = None,

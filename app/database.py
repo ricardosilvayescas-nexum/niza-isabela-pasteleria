@@ -19,7 +19,11 @@ DATABASE_URL = os.getenv(
     "mssql+pyodbc://sa:TuPassword123@localhost:1433/niza_isabela?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes",
 )
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=280,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

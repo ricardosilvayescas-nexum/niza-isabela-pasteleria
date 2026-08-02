@@ -41,19 +41,25 @@
     <p id="correo-usuario"></p>
   </div>
 
-  <div class="panel">
-    <details class="account-section" open>
-      <summary>🧁 Mis pedidos</summary>
-      <div id="lista-pedidos"><p class="account-item">Cargando…</p></div>
-    </details>
-    <details class="account-section">
-      <summary>✉️ Mis cotizaciones</summary>
-      <div id="lista-cotizaciones"><p class="account-item">Cargando…</p></div>
-    </details>
-    <details class="account-section">
-      <summary>📄 Mis cursos</summary>
-      <div id="lista-cursos"><p class="account-item">Cargando…</p></div>
-    </details>
+  <div class="cuenta-tarjetas">
+    <a class="cuenta-tarjeta" href="mis-pedidos.html">
+      <div class="cuenta-tarjeta-icono">🧁</div>
+      <h3>Mis pedidos</h3>
+      <p>Consulta el estado de tus pasteles</p>
+      <span class="cuenta-tarjeta-flecha">→</span>
+    </a>
+    <a class="cuenta-tarjeta" href="mis-cotizaciones.html">
+      <div class="cuenta-tarjeta-icono">✉️</div>
+      <h3>Mis cotizaciones</h3>
+      <p>Revisa tus solicitudes de pastel personalizado</p>
+      <span class="cuenta-tarjeta-flecha">→</span>
+    </a>
+    <a class="cuenta-tarjeta" href="mis-cursos.html">
+      <div class="cuenta-tarjeta-icono">📄</div>
+      <h3>Mis cursos</h3>
+      <p>Descarga tus PDFs y ve tus videos</p>
+      <span class="cuenta-tarjeta-flecha">→</span>
+    </a>
   </div>
 
   <button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="nizaLogout()">Cerrar sesión</button>

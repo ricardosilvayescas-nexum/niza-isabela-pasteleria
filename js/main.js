@@ -6,7 +6,15 @@
 /* ---------- Conexión con el backend ----------
    Cambia esta URL cuando despliegues el backend en Azure
    (ej. https://niza-isabela-api.azurewebsites.net) */
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = (function () {
+  const host = window.location.hostname;
+  if (host.includes('calm-moss-0afca6010')) {
+    // Sitio de producción real (Isabela)
+    return 'https://niza-isabela-api-2004-f2ehctb0cugddvfy.centralus-01.azurewebsites.net';
+  }
+  // Sitio de pruebas (tuyo) y entorno local
+  return 'https://niza-isabela-api-c9d8a3ghbddqe3hr.centralus-01.azurewebsites.net';
+})();
 /* ---------- Carrito de compras (localStorage) ---------- */
 const CART_KEY = 'niza_carrito';
 
@@ -192,6 +200,9 @@ async function initSucursalSelect(selectId) {
     select.innerHTML = '<option>No se pudieron cargar</option>';
   }
 }
+
+
+
 
 function sucursalRowHTML(s, index) {
   return `<div class="sucursal-row ${index === 0 ? 'sel' : ''}" data-id="${s.id}"><span>${s.nombre} — ${s.direccion}</span><span>${index === 0 ? '✓' : ''}</span></div>`;
@@ -545,6 +556,36 @@ async function initCursosBandHome() {
   } catch (err) {
     grid.innerHTML = `<p style="grid-column:1/-1; color:#D8CBB0; text-align:center;">No se pudieron cargar los cursos.</p>`;
   }
+}
+
+
+
+async function subirVideoDirecto(archivo, onProgreso) {
+  const sasRes = await authFetch(`${API_BASE_URL}/api/uploads/sas-video?filename=${encodeURIComponent(archivo.name)}`);
+  if (!sasRes.ok) throw new Error('No se pudo generar el permiso de subida');
+  const { upload_url, public_url } = await sasRes.json();
+
+  await new Promise(function (resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', upload_url);
+    xhr.setRequestHeader('x-ms-blob-type', 'BlockBlob');
+    xhr.setRequestHeader('Content-Type', archivo.type || 'video/mp4');
+
+    xhr.upload.addEventListener('progress', function (e) {
+      if (e.lengthComputable && onProgreso) {
+        onProgreso(Math.round((e.loaded / e.total) * 100));
+      }
+    });
+
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error('Error al subir el video (status ' + xhr.status + ')'));
+    };
+    xhr.onerror = function () { reject(new Error('Error de red al subir el video')); };
+    xhr.send(archivo);
+  });
+
+  return public_url;
 }
 
 function homeCourseCardHTML(c) {

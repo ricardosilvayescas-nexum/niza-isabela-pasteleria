@@ -37,6 +37,7 @@ def calcular_precio_curso(curso: models.Curso) -> schemas.CursoOut:
         tiene_descuento=tiene_descuento,
         portada_url=curso.portada_url,
         archivo_pdf_url=curso.archivo_pdf_url,
+        archivo_video_url=curso.archivo_video_url,
         activo=curso.activo,
     )
 
@@ -79,7 +80,9 @@ def mis_cursos(
             resultado.append({
                 "curso_id": curso.id,
                 "nombre": curso.nombre,
+                "portada_url": curso.portada_url,
                 "archivo_pdf_url": curso.archivo_pdf_url,
+                "archivo_video_url": curso.archivo_video_url,
                 "comprado_el": compra.created_at,
             })
     return resultado

@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 .vscode/
 *.log
+Multimedia/
+*.mov
+*.mp4
+*.avi

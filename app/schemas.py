@@ -38,6 +38,7 @@ class CursoOut(BaseModel):
     tiene_descuento: bool
     portada_url: Optional[str] = None
     archivo_pdf_url: Optional[str] = None
+    archivo_video_url: Optional[str] = None
     activo: bool
 
 
@@ -219,7 +220,8 @@ class CursoCreate(BaseModel):
     descripcion: Optional[str] = None
     precio: float
     portada_url: Optional[str] = None
-    archivo_pdf_url: str
+    archivo_pdf_url: Optional[str] = None
+    archivo_video_url: Optional[str] = None
     activo: bool = True
 
 
@@ -229,6 +231,7 @@ class CursoUpdate(BaseModel):
     precio: float
     portada_url: Optional[str] = None
     archivo_pdf_url: Optional[str] = None
+    archivo_video_url: Optional[str] = None
     activo: bool
 
 

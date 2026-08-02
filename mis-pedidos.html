@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Mis pedidos — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+</nav>
+
+<div class="form-wrap">
+  <a class="back-link" href="cuenta.html">← Volver a mi cuenta</a>
+  <div class="form-head">
+    <div class="eyebrow">Mi cuenta</div>
+    <h1>Mis pedidos</h1>
+  </div>
+
+  <div id="lista-pedidos"><p style="text-align:center; color:var(--grey);">Cargando…</p></div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script>
+  const ESTADO_LABEL = { recibido: 'Recibido', en_produccion: 'En producción', listo: 'Listo', entregado: 'Entregado' };
+
+  function pedidoItemHTML(p) {
+    const entregaTexto = p.tipo_entrega === 'digital'
+      ? 'Entrega digital'
+      : `${p.tipo_entrega === 'recoger' ? 'Recoger en ' + (p.sucursal_nombre || 'sucursal') : 'Delivery'} — ${new Date(p.fecha_entrega).toLocaleDateString('es-MX')}`;
+
+    return `
+      <div class="detalle-item-card">
+        <div class="detalle-item-header">
+          <div>
+            <div class="detalle-item-titulo">Pedido #${p.id.slice(0, 8)}</div>
+            <div class="detalle-item-fecha">${new Date(p.created_at).toLocaleDateString('es-MX')}</div>
+          </div>
+          <span class="status ${p.estado === 'entregado' ? 'entregado' : 'produccion'}">${ESTADO_LABEL[p.estado] || p.estado}</span>
+        </div>
+        <p style="font-size:13.5px; color:var(--ink); line-height:1.7; margin-bottom:10px;">${p.productos}</p>
+        <p style="font-size:12.5px; color:var(--grey);">${entregaTexto}</p>
+        <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-weight:600;">$${p.total.toFixed(0)} MXN</div>
+      </div>`;
+  }
+
+  (async function () {
+    const usuario = getStoredUser();
+    if (!usuario) { window.location.href = 'login.html'; return; }
+
+    const cont = document.getElementById('lista-pedidos');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/pedidos/mis-pedidos/detalle`);
+      const pedidos = await res.json();
+      cont.innerHTML = pedidos.length
+        ? pedidos.map(pedidoItemHTML).join('')
+        : '<p style="text-align:center; color:var(--grey);">Aún no tienes pedidos.</p>';
+    } catch {
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar tus pedidos.</p>';
+    }
+  })();
+</script>
+</body>
+</html>

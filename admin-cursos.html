@@ -100,6 +100,30 @@
         </div>
         <span class="upload-status" id="curso-pdf-status"></span>
       </div>
+
+      <label class="small">Video del curso (opcional)</label>
+      <div style="margin-bottom:14px;">
+        <input type="file" id="curso-video-file" accept="video/mp4,video/quicktime,video/webm" hidden>
+        <input type="hidden" id="curso-video-url">
+        <label for="curso-video-file" class="upload-trigger" id="curso-video-trigger">
+          <span class="upload-icon">🎬</span>
+          <span>Toca para subir un video (máx. recomendado: 500 MB)</span>
+        </label>
+        <div class="upload-result" id="curso-video-result" style="display:none;">
+          <div class="upload-doc-icon">🎬</div>
+          <div class="upload-result-info">
+            <span class="upload-check">✓ Video subido correctamente</span>
+            <span class="upload-doc-name" id="curso-video-name"></span>
+            <button type="button" class="upload-change-btn" onclick="document.getElementById('curso-video-file').click()">Cambiar video</button>
+          </div>
+        </div>
+        <div class="upload-progress-wrap" id="curso-video-progress-wrap" style="display:none;">
+          <div class="upload-progress-bar"><div class="upload-progress-fill" id="curso-video-progress-fill"></div></div>
+          <div class="upload-progress-text" id="curso-video-progress-text">Subiendo... 0%</div>
+        </div>
+        <span class="upload-status" id="curso-video-status"></span>
+      </div>
+
       <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:20px;">
         <input type="checkbox" id="curso-activo"> Curso activo (visible en el sitio)
       </label>
@@ -124,7 +148,7 @@
         </div>
         <div style="font-size:13px; font-weight:600;">${c.activo ? '$' + Number(c.precio_final).toFixed(0) + ' MXN' : '—'}</div>
         <div class="toggle ${c.activo ? 'on' : ''}" title="${c.activo ? 'Activo' : 'Inactivo'}" onclick="toggleCursoActivo('${c.id}')"></div>
-        <button class="btn-mini" onclick="editarCurso('${c.id}')">${c.archivo_pdf_url ? 'Editar' : 'Editar'}</button>
+        <button class="btn-mini" onclick="editarCurso('${c.id}')">Editar</button>
       </div>`;
   }
 
@@ -145,6 +169,7 @@
     document.getElementById('curso-nombre').value = curso ? curso.nombre : '';
     document.getElementById('curso-descripcion').value = curso ? (curso.descripcion || '') : '';
     document.getElementById('curso-precio').value = curso ? curso.precio_original : '';
+
     document.getElementById('curso-portada').value = curso ? (curso.portada_url || '') : '';
     document.getElementById('curso-portada-file').value = '';
     document.getElementById('curso-portada-status').textContent = '';
@@ -157,6 +182,7 @@
       document.getElementById('curso-portada-result').style.display = 'none';
       document.getElementById('curso-portada-trigger').style.display = 'flex';
     }
+
     document.getElementById('curso-pdf').value = curso ? (curso.archivo_pdf_url || '') : '';
     document.getElementById('curso-pdf-file').value = '';
     document.getElementById('curso-pdf-status').textContent = '';
@@ -169,6 +195,20 @@
       document.getElementById('curso-pdf-result').style.display = 'none';
       document.getElementById('curso-pdf-trigger').style.display = 'flex';
     }
+
+    document.getElementById('curso-video-url').value = curso ? (curso.archivo_video_url || '') : '';
+    document.getElementById('curso-video-file').value = '';
+    document.getElementById('curso-video-status').textContent = '';
+    document.getElementById('curso-video-progress-wrap').style.display = 'none';
+    if (curso && curso.archivo_video_url) {
+      document.getElementById('curso-video-name').textContent = curso.archivo_video_url.split('/').pop();
+      document.getElementById('curso-video-result').style.display = 'flex';
+      document.getElementById('curso-video-trigger').style.display = 'none';
+    } else {
+      document.getElementById('curso-video-result').style.display = 'none';
+      document.getElementById('curso-video-trigger').style.display = 'flex';
+    }
+
     document.getElementById('curso-activo').checked = curso ? curso.activo : true;
     document.getElementById('curso-modal').classList.add('open');
   }
@@ -189,7 +229,8 @@
       descripcion: document.getElementById('curso-descripcion').value,
       precio: parseFloat(document.getElementById('curso-precio').value),
       portada_url: document.getElementById('curso-portada').value,
-      archivo_pdf_url: document.getElementById('curso-pdf').value,
+      archivo_pdf_url: document.getElementById('curso-pdf').value || null,
+      archivo_video_url: document.getElementById('curso-video-url').value || null,
       activo: document.getElementById('curso-activo').checked,
     };
     const url = id ? `${API_BASE_URL}/api/cursos/admin/${id}` : `${API_BASE_URL}/api/cursos/admin`;
@@ -225,48 +266,88 @@
     cargarCursosAdmin();
   }
 
+  document.getElementById('curso-portada-file').addEventListener('change', async function (e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    const status = document.getElementById('curso-portada-status');
+    const trigger = document.getElementById('curso-portada-trigger');
+    status.className = 'upload-status uploading';
+    status.textContent = 'Subiendo imagen...';
+    try {
+      const url = await subirArchivo(archivo, 'imagen');
+      document.getElementById('curso-portada').value = url;
+      document.getElementById('curso-portada-img').src = url;
+      document.getElementById('curso-portada-result').style.display = 'flex';
+      trigger.style.display = 'none';
+      status.className = 'upload-status';
+      status.textContent = '';
+    } catch {
+      status.className = 'upload-status error';
+      status.textContent = 'Error al subir la imagen. Intenta de nuevo.';
+    }
+  });
 
-document.getElementById('curso-portada-file').addEventListener('change', async function (e) {
-  const archivo = e.target.files[0];
-  if (!archivo) return;
-  const status = document.getElementById('curso-portada-status');
-  const trigger = document.getElementById('curso-portada-trigger');
-  status.className = 'upload-status uploading';
-  status.textContent = 'Subiendo imagen...';
-  try {
-    const url = await subirArchivo(archivo, 'imagen');
-    document.getElementById('curso-portada').value = url;
-    document.getElementById('curso-portada-img').src = url;
-    document.getElementById('curso-portada-result').style.display = 'flex';
+  document.getElementById('curso-pdf-file').addEventListener('change', async function (e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    const status = document.getElementById('curso-pdf-status');
+    const trigger = document.getElementById('curso-pdf-trigger');
+    status.className = 'upload-status uploading';
+    status.textContent = 'Subiendo PDF...';
+    try {
+      const url = await subirArchivo(archivo, 'pdf');
+      document.getElementById('curso-pdf').value = url;
+      document.getElementById('curso-pdf-name').textContent = archivo.name;
+      document.getElementById('curso-pdf-result').style.display = 'flex';
+      trigger.style.display = 'none';
+      status.className = 'upload-status';
+      status.textContent = '';
+    } catch {
+      status.className = 'upload-status error';
+      status.textContent = 'Error al subir el PDF. Intenta de nuevo.';
+    }
+  });
+
+  document.getElementById('curso-video-file').addEventListener('change', async function (e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+
+    const status = document.getElementById('curso-video-status');
+    const trigger = document.getElementById('curso-video-trigger');
+    const progressWrap = document.getElementById('curso-video-progress-wrap');
+    const progressFill = document.getElementById('curso-video-progress-fill');
+    const progressText = document.getElementById('curso-video-progress-text');
+
+    const limiteMB = 800;
+    if (archivo.size > limiteMB * 1024 * 1024) {
+      status.className = 'upload-status error';
+      status.textContent = `El video supera ${limiteMB} MB. Comprímelo antes de subirlo.`;
+      e.target.value = '';
+      return;
+    }
+
     trigger.style.display = 'none';
+    progressWrap.style.display = 'block';
     status.className = 'upload-status';
     status.textContent = '';
-  } catch {
-    status.className = 'upload-status error';
-    status.textContent = 'Error al subir la imagen. Intenta de nuevo.';
-  }
-});
 
-document.getElementById('curso-pdf-file').addEventListener('change', async function (e) {
-  const archivo = e.target.files[0];
-  if (!archivo) return;
-  const status = document.getElementById('curso-pdf-status');
-  const trigger = document.getElementById('curso-pdf-trigger');
-  status.className = 'upload-status uploading';
-  status.textContent = 'Subiendo PDF...';
-  try {
-    const url = await subirArchivo(archivo, 'pdf');
-    document.getElementById('curso-pdf').value = url;
-    document.getElementById('curso-pdf-name').textContent = archivo.name;
-    document.getElementById('curso-pdf-result').style.display = 'flex';
-    trigger.style.display = 'none';
-    status.className = 'upload-status';
-    status.textContent = '';
-  } catch {
-    status.className = 'upload-status error';
-    status.textContent = 'Error al subir el PDF. Intenta de nuevo.';
-  }
-});
+    try {
+      const url = await subirVideoDirecto(archivo, function (pct) {
+        progressFill.style.width = pct + '%';
+        progressText.textContent = `Subiendo... ${pct}%`;
+      });
+      document.getElementById('curso-video-url').value = url;
+      document.getElementById('curso-video-name').textContent = archivo.name;
+      document.getElementById('curso-video-result').style.display = 'flex';
+      progressWrap.style.display = 'none';
+    } catch (err) {
+      status.className = 'upload-status error';
+      status.textContent = 'Error al subir el video. Intenta de nuevo.';
+      progressWrap.style.display = 'none';
+      trigger.style.display = 'flex';
+    }
+  });
+
   cargarCursosAdmin();
 </script>
 </body>

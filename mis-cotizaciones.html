@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Mis cotizaciones — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+</nav>
+
+<div class="form-wrap">
+  <a class="back-link" href="cuenta.html">← Volver a mi cuenta</a>
+  <div class="form-head">
+    <div class="eyebrow">Mi cuenta</div>
+    <h1>Mis cotizaciones</h1>
+  </div>
+
+  <div id="lista-cotizaciones"><p style="text-align:center; color:var(--grey);">Cargando…</p></div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script>
+  const ESTADO_COT_LABEL = { nueva: 'Nueva', contactada: 'Contactada', cerrada: 'Cerrada' };
+
+  function cotizacionItemHTML(c) {
+    return `
+      <div class="detalle-item-card">
+        <div class="detalle-item-header">
+          <div>
+            <div class="detalle-item-titulo">Solicitud de pastel personalizado</div>
+            <div class="detalle-item-fecha">${new Date(c.created_at).toLocaleDateString('es-MX')}</div>
+          </div>
+          <span class="status ${c.estado === 'cerrada' ? 'entregado' : 'produccion'}">${ESTADO_COT_LABEL[c.estado] || c.estado}</span>
+        </div>
+        <p style="font-size:13.5px; color:var(--ink); line-height:1.8;">
+          ${c.tamano ? `<b>Tamaño:</b> ${c.tamano}<br>` : ''}
+          ${c.sabor ? `<b>Sabor:</b> ${c.sabor}<br>` : ''}
+          <b>Fecha deseada:</b> ${new Date(c.fecha_deseada).toLocaleDateString('es-MX')}
+        </p>
+      </div>`;
+  }
+
+  (async function () {
+    const usuario = getStoredUser();
+    if (!usuario) { window.location.href = 'login.html'; return; }
+
+    const cont = document.getElementById('lista-cotizaciones');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/cotizaciones/mias`);
+      const cotizaciones = await res.json();
+      cont.innerHTML = cotizaciones.length
+        ? cotizaciones.map(cotizacionItemHTML).join('')
+        : '<p style="text-align:center; color:var(--grey);">Aún no tienes cotizaciones.</p>';
+    } catch {
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar tus cotizaciones.</p>';
+    }
+  })();
+</script>
+</body>
+</html>

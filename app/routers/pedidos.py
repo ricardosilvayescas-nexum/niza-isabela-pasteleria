@@ -129,6 +129,48 @@ def mis_pedidos(
         .all()
     )
 
+@router.get("/mis-pedidos/detalle")
+def mis_pedidos_detalle(
+    db: Session = Depends(get_db),
+    usuario_actual: models.Usuario = Depends(security.get_current_user),
+):
+    """Versión enriquecida de 'mis pedidos' — incluye productos, cursos y sucursal,
+    para mostrar el detalle completo en la sección 'Mis pedidos' de la cuenta del cliente."""
+    pedidos = (
+        db.query(models.Pedido)
+        .filter(models.Pedido.usuario_id == usuario_actual.id)
+        .order_by(models.Pedido.created_at.desc())
+        .all()
+    )
+
+    resultado = []
+    for p in pedidos:
+        items = db.query(models.PedidoItem).filter(models.PedidoItem.pedido_id == p.id).all()
+        productos_texto = []
+        for item in items:
+            producto = db.query(models.Producto).filter(models.Producto.id == item.producto_id).first()
+            if producto:
+                productos_texto.append(f"{producto.nombre} x{item.cantidad}")
+
+        compras_curso = db.query(models.CompraCurso).filter(models.CompraCurso.pedido_id == p.id).all()
+        for compra in compras_curso:
+            curso = db.query(models.Curso).filter(models.Curso.id == compra.curso_id).first()
+            if curso:
+                productos_texto.append(f"{curso.nombre} (curso)")
+
+        sucursal = db.query(models.Sucursal).filter(models.Sucursal.id == p.sucursal_id).first() if p.sucursal_id else None
+
+        resultado.append({
+            "id": p.id,
+            "estado": p.estado,
+            "total": float(p.total),
+            "tipo_entrega": p.tipo_entrega,
+            "fecha_entrega": p.fecha_entrega,
+            "sucursal_nombre": sucursal.nombre if sucursal else None,
+            "productos": ", ".join(productos_texto) if productos_texto else "—",
+            "created_at": p.created_at,
+        })
+    return resultado
 
 @router.patch("/{pedido_id}/estado")
 def actualizar_estado_pedido(

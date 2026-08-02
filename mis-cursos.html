@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Mis cursos — Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<nav class="site-nav">
+  <a class="logo" href="index.html">Niza <span>Isabela</span></a>
+</nav>
+
+<div class="form-wrap">
+  <a class="back-link" href="cuenta.html">← Volver a mi cuenta</a>
+  <div class="form-head">
+    <div class="eyebrow">Mi cuenta</div>
+    <h1>Mis cursos</h1>
+  </div>
+
+  <div id="lista-cursos"><p style="text-align:center; color:var(--grey);">Cargando…</p></div>
+</div>
+
+<footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
+
+<script src="js/main.js"></script>
+<script>
+  function cursoItemHTML(c) {
+    return `
+      <div class="detalle-item-card">
+        <div class="detalle-item-header">
+          <div style="display:flex; gap:14px; align-items:center;">
+            ${c.portada_url ? `<img src="${c.portada_url}" alt="${c.nombre}" style="width:56px; height:56px; border-radius:8px; object-fit:cover; flex-shrink:0;">` : ''}
+            <div>
+              <div class="detalle-item-titulo">${c.nombre}</div>
+              <div class="detalle-item-fecha">Comprado el ${new Date(c.comprado_el).toLocaleDateString('es-MX')}</div>
+            </div>
+          </div>
+        </div>
+        ${c.archivo_video_url ? `
+          <video class="video-player" controls preload="metadata" src="${c.archivo_video_url}"></video>
+          <a class="btn btn-outline" style="margin-top:10px; display:inline-block; font-size:12px; padding:8px 16px;" href="${c.archivo_video_url}" download target="_blank" rel="noopener">⬇ Descargar video</a>
+        ` : ''}
+        ${c.archivo_pdf_url ? `<a class="btn btn-outline" style="margin-top:14px; display:inline-block;" href="${c.archivo_pdf_url}" target="_blank" rel="noopener">📄 Descargar PDF</a>` : ''}
+        ${!c.archivo_video_url && !c.archivo_pdf_url ? '<p style="font-size:13px; color:var(--grey);">El material de este curso aún no está disponible.</p>' : ''}
+      </div>`;
+  }
+
+  (async function () {
+    const usuario = getStoredUser();
+    if (!usuario) { window.location.href = 'login.html'; return; }
+
+    const cont = document.getElementById('lista-cursos');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/cursos/mis-cursos/todos`);
+      const cursos = await res.json();
+      cont.innerHTML = cursos.length
+        ? cursos.map(cursoItemHTML).join('')
+        : '<p style="text-align:center; color:var(--grey);">Aún no has comprado cursos.</p>';
+    } catch {
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar tus cursos.</p>';
+    }
+  })();
+</script>
+</body>
+</html>
