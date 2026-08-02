@@ -9,11 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
-<style>
-  .account-section{ margin-bottom:14px; }
-  .account-section summary{ cursor:pointer; font-weight:600; padding:16px 0; list-style:none; }
-  .account-item{ font-size:13px; padding:10px 0; border-bottom:1px solid var(--line); }
-</style>
 </head>
 <body style="background-color:#FFFDEE;">
 
@@ -69,30 +64,5 @@
 
 <script src="js/main.js"></script>
 <script src="js/animations.js"></script>
-<script>
-  (function () {
-    const usuario = getStoredUser();
-    if (!usuario) { window.location.href = 'login.html'; return; }
-    document.getElementById('saludo').textContent = `Hola, ${usuario.nombre}`;
-    document.getElementById('correo-usuario').textContent = usuario.email;
-
-    authFetch(`${API_BASE_URL}/api/pedidos/mis-pedidos`).then(r => r.ok ? r.json() : []).then(pedidos => {
-      const el = document.getElementById('lista-pedidos');
-      el.innerHTML = pedidos.length
-        ? pedidos.map(p => `<div class="account-item">#${p.id.slice(0,8)} — ${p.estado} — $${p.total} MXN</div>`).join('')
-        : '<p class="account-item">Aún no tienes pedidos.</p>';
-    }).catch(() => {});
-
-    authFetch(`${API_BASE_URL}/api/cursos/mis-cursos/todos`).then(r => r.ok ? r.json() : []).then(cursos => {
-      const el = document.getElementById('lista-cursos');
-      el.innerHTML = cursos.length
-        ? cursos.map(c => `<div class="account-item">${c.nombre} — <a href="${c.archivo_pdf_url}" target="_blank">Descargar PDF</a></div>`).join('')
-        : '<p class="account-item">Aún no has comprado cursos.</p>';
-    }).catch(() => {});
-
-    document.getElementById('lista-cotizaciones').innerHTML =
-      '<p class="account-item">Tus cotizaciones enviadas aparecerán aquí.</p>';
-  })();
-</script>
 </body>
 </html>

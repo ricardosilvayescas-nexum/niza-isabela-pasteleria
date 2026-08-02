@@ -23,8 +23,10 @@ def enviar_correo(destinatario: str, asunto: str, contenido_html: str) -> bool:
     if not destinatario:
         return False
 
+    from sendgrid.helpers.mail import From
+
     mensaje = Mail(
-        from_email=SENDGRID_FROM_EMAIL,
+        from_email=From(SENDGRID_FROM_EMAIL, "Niza Isabela Pastelería"),
         to_emails=destinatario,
         subject=asunto,
         html_content=contenido_html,
