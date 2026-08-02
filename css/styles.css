@@ -590,3 +590,34 @@ nav.site-nav.scrolled{
 .video-player{
   width:100%; border-radius:8px; margin-top:12px; background:#000; max-height:400px;
 }
+
+.nav-logo-img{
+  height:52px;
+  width:auto;
+  display:block;
+}
+@media(max-width:700px){
+  .nav-logo-img{ height:40px; }
+}
+
+
+
+/* ===== RECORTADOR DE IMÁGENES ===== */
+.cropper-overlay{
+  display:flex; position:fixed; inset:0; background:rgba(46,32,19,0); z-index:300;
+  align-items:center; justify-content:center; padding:24px;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .25s ease, background .25s ease, visibility 0s linear .25s;
+}
+.cropper-overlay.open{
+  opacity:1; visibility:visible; pointer-events:auto; background:rgba(46,32,19,.55);
+  transition:opacity .25s ease, background .25s ease, visibility 0s linear 0s;
+}
+.cropper-box{
+  background:#fff; border-radius:10px; padding:28px; max-width:640px; width:100%;
+  max-height:88vh; display:flex; flex-direction:column; gap:16px;
+}
+.cropper-box h3{ margin:0; }
+.cropper-img-wrap{ max-height:55vh; overflow:hidden; background:#000; border-radius:6px; }
+.cropper-img-wrap img{ display:block; max-width:100%; }
+.cropper-actions{ display:flex; gap:10px; justify-content:flex-end; }

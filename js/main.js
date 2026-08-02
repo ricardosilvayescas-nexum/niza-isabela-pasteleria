@@ -711,6 +711,69 @@ function wireCourseViewLinks() {
   });
 }
 
+
+let _cropperInstance = null;
+
+function _crearModalCropper() {
+  if (document.getElementById('cropper-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'cropper-overlay';
+  overlay.className = 'cropper-overlay';
+  overlay.innerHTML = `
+    <div class="cropper-box">
+      <h3>Ajusta tu imagen</h3>
+      <div class="cropper-img-wrap"><img id="cropper-image"></div>
+      <div class="cropper-actions">
+        <button type="button" class="btn btn-outline" id="cropper-cancel-btn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="cropper-confirm-btn">Usar esta imagen</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function openImageCropper(file, aspectRatio) {
+  return new Promise(function (resolve, reject) {
+    _crearModalCropper();
+    const overlay = document.getElementById('cropper-overlay');
+    const imgEl = document.getElementById('cropper-image');
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      imgEl.src = e.target.result;
+      overlay.classList.add('open');
+      if (_cropperInstance) _cropperInstance.destroy();
+      _cropperInstance = new Cropper(imgEl, {
+        aspectRatio: aspectRatio || NaN, // NaN = recorte libre, sin proporción forzada
+        viewMode: 1,
+        autoCropArea: 1,
+        background: false,
+      });
+    };
+    reader.readAsDataURL(file);
+
+    const btnConfirm = document.getElementById('cropper-confirm-btn');
+    const btnCancel = document.getElementById('cropper-cancel-btn');
+
+    function limpiar() {
+      overlay.classList.remove('open');
+      if (_cropperInstance) { _cropperInstance.destroy(); _cropperInstance = null; }
+      btnConfirm.onclick = null;
+      btnCancel.onclick = null;
+    }
+
+    btnConfirm.onclick = function () {
+      _cropperInstance.getCroppedCanvas().toBlob(function (blob) {
+        limpiar();
+        resolve(blob);
+      }, file.type || 'image/jpeg', 0.9);
+    };
+    btnCancel.onclick = function () {
+      limpiar();
+      reject(new Error('cancelado'));
+    };
+  });
+}
+
 function wireCourseViewModalClose() {
   var courseView = document.getElementById('courseView');
   if (!courseView) return;
@@ -721,9 +784,10 @@ function wireCourseViewModalClose() {
   });
 }
 
-async function subirArchivo(archivo, tipo) {
+async function subirArchivo(archivo, tipo, nombreArchivo) {
   const formData = new FormData();
-  formData.append('archivo', archivo);
+  const nombre = nombreArchivo || archivo.name || `archivo.${tipo === 'pdf' ? 'pdf' : 'jpg'}`;
+  formData.append('archivo', archivo, nombre);
   const res = await authFetch(`${API_BASE_URL}/api/uploads/${tipo}`, {
     method: 'POST',
     body: formData,

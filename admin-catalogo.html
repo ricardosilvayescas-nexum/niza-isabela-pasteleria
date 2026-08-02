@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 <style>
   .item-row{ display:grid; grid-template-columns:56px 1fr auto auto auto auto; gap:16px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
   .item-row:last-child{ border-bottom:none; }
@@ -110,6 +111,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script src="js/main.js"></script>
 <script src="js/animations.js"></script>
 <script>requireAdmin();</script>
@@ -283,14 +285,21 @@
 
 
   document.getElementById('producto-foto-file').addEventListener('change', async function (e) {
-  const archivo = e.target.files[0];
-  if (!archivo) return;
+  const archivoOriginal = e.target.files[0];
+  if (!archivoOriginal) return;
   const status = document.getElementById('producto-foto-status');
   const trigger = document.getElementById('producto-foto-trigger');
+  let archivo;
+  try {
+    archivo = await openImageCropper(archivoOriginal, 1);
+  } catch {
+    e.target.value = '';
+    return; // canceló el recorte
+  }
   status.className = 'upload-status uploading';
   status.textContent = 'Subiendo imagen...';
   try {
-    const url = await subirArchivo(archivo, 'imagen');
+    const url = await subirArchivo(archivo, 'imagen', archivoOriginal.name);
     document.getElementById('producto-foto').value = url;
     document.getElementById('producto-foto-img').src = url;
     document.getElementById('producto-foto-result').style.display = 'flex';

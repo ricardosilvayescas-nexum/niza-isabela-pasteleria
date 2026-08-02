@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 </head>
 <body style="background-color:#FFFDEE;">
 
@@ -120,21 +121,30 @@
 
 <footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México</footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script src="js/main.js"></script>
 <script src="js/animations.js"></script>
 <script>
   const LIMITE_FOTO_MB = 20;
 
   document.getElementById('cotiza-foto-file').addEventListener('change', async function (e) {
-    const archivo = e.target.files[0];
-    if (!archivo) return;
+    const archivoOriginal = e.target.files[0];
+    if (!archivoOriginal) return;
 
     const status = document.getElementById('cotiza-foto-status');
     const trigger = document.getElementById('cotiza-foto-trigger');
 
-    if (archivo.size > LIMITE_FOTO_MB * 1024 * 1024) {
+    if (archivoOriginal.size > LIMITE_FOTO_MB * 1024 * 1024) {
       status.className = 'upload-status error';
       status.textContent = `La imagen supera el límite de ${LIMITE_FOTO_MB} MB. Elige una más ligera.`;
+      e.target.value = '';
+      return;
+    }
+
+    let archivo;
+    try {
+      archivo = await openImageCropper(archivoOriginal, null); // recorte libre
+    } catch {
       e.target.value = '';
       return;
     }
@@ -142,7 +152,7 @@
     status.className = 'upload-status uploading';
     status.textContent = 'Subiendo imagen...';
     try {
-      const url = await subirArchivo(archivo, 'imagen');
+      const url = await subirArchivo(archivo, 'imagen', archivoOriginal.name);
       document.getElementById('cotiza-foto-url').value = url;
       document.getElementById('cotiza-foto-img').src = url;
       document.getElementById('cotiza-foto-result').style.display = 'flex';
