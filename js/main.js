@@ -8,8 +8,8 @@
    (ej. https://niza-isabela-api.azurewebsites.net) */
 const API_BASE_URL = (function () {
   const host = window.location.hostname;
-  if (host.includes('calm-moss-0afca6010')) {
-    // Sitio de producción real (Isabela)
+  if (host.includes('calm-moss-0afca6010') || host.includes('nizaisabelapasteleria.com')) {
+    // Sitio de producción real (Isabela) — Azure o dominio propio
     return 'https://niza-isabela-api-2004-f2ehctb0cugddvfy.centralus-01.azurewebsites.net';
   }
   // Sitio de pruebas (tuyo) y entorno local
