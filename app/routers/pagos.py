@@ -86,7 +86,7 @@ def crear_preferencia(
         db.add(pago)
         db.commit()
 
-    return {"init_point": preferencia["sandbox_init_point"], "preference_id": preferencia["id"]}
+    return {"init_point": preferencia["init_point"], "preference_id": preferencia["id"]}
 
 
 @router.post("/webhook")
