@@ -10,6 +10,8 @@ from ..database import get_db
 
 router = APIRouter(prefix="/api/reportes", tags=["Reportes"])
 
+ESTADOS_PAGADOS = ("en_produccion", "listo", "entregado")
+
 
 @router.get("/resumen")
 def resumen_reportes(
@@ -19,7 +21,15 @@ def resumen_reportes(
     hoy = date.today()
     primer_dia_mes = hoy.replace(day=1)
 
-    pedidos_mes = db.query(models.Pedido).filter(models.Pedido.created_at >= primer_dia_mes).all()
+    # Solo pedidos con pago confirmado (excluye 'recibido' = intento sin pagar)
+    pedidos_mes = (
+        db.query(models.Pedido)
+        .filter(
+            models.Pedido.created_at >= primer_dia_mes,
+            models.Pedido.estado.in_(ESTADOS_PAGADOS),
+        )
+        .all()
+    )
     compras_mes = (
         db.query(models.CompraCurso)
         .filter(
@@ -29,18 +39,30 @@ def resumen_reportes(
         .all()
     )
 
-    ventas_pasteles = sum(float(p.total) for p in pedidos_mes)
+    # Ventas de pasteles = solo el valor de los PedidoItem (excluye el monto de cursos,
+    # que ya viaja aparte en compras_cursos aunque comparta el mismo Pedido)
+    ventas_pasteles = 0.0
+    pedidos_con_producto = 0
+    for p in pedidos_mes:
+        items = db.query(models.PedidoItem).filter(models.PedidoItem.pedido_id == p.id).all()
+        subtotal_items = sum(float(i.precio_unitario) * i.cantidad for i in items)
+        if items:
+            pedidos_con_producto += 1
+        ventas_pasteles += subtotal_items
+
     ventas_cursos = sum(float(c.monto) for c in compras_mes)
     ventas_totales = ventas_pasteles + ventas_cursos
 
-    total_transacciones = len(pedidos_mes) + len(compras_mes)
+    total_transacciones = pedidos_con_producto + len(compras_mes)
     ticket_promedio = round(ventas_totales / total_transacciones, 2) if total_transacciones else 0
 
     # Ventas por semana del mes actual (4 buckets)
     semanas = [0.0, 0.0, 0.0, 0.0]
     for p in pedidos_mes:
+        items = db.query(models.PedidoItem).filter(models.PedidoItem.pedido_id == p.id).all()
+        subtotal_items = sum(float(i.precio_unitario) * i.cantidad for i in items)
         idx = min((p.created_at.day - 1) // 7, 3)
-        semanas[idx] += float(p.total)
+        semanas[idx] += subtotal_items
     for c in compras_mes:
         idx = min((c.created_at.day - 1) // 7, 3)
         semanas[idx] += float(c.monto)
@@ -53,23 +75,37 @@ def resumen_reportes(
     pct_pasteles = round(ventas_pasteles / ventas_totales * 100) if ventas_totales else 0
     pct_cursos = 100 - pct_pasteles if ventas_totales else 0
 
+    # Pedidos recientes: una fila por Pedido real (sin duplicar cursos que ya viven dentro de un pedido)
     recientes = []
-    for p in db.query(models.Pedido).order_by(models.Pedido.created_at.desc()).limit(5).all():
+    for p in (
+        db.query(models.Pedido)
+        .filter(models.Pedido.estado.in_(ESTADOS_PAGADOS))
+        .order_by(models.Pedido.created_at.desc())
+        .limit(10)
+        .all()
+    ):
+        items = db.query(models.PedidoItem).filter(models.PedidoItem.pedido_id == p.id).all()
+        cursos_del_pedido = db.query(models.CompraCurso).filter(
+            models.CompraCurso.pedido_id == p.id,
+            models.CompraCurso.estado_pago == "aprobado",
+        ).all()
+
+        if items and cursos_del_pedido:
+            tipo = "mixto"
+        elif cursos_del_pedido:
+            tipo = "curso"
+        else:
+            tipo = "pastel"
+
         recientes.append({
-            "id": p.id, "tipo": "pastel", "sucursal_id": p.sucursal_id,
+            "id": p.id, "tipo": tipo, "sucursal_id": p.sucursal_id,
             "estado": p.estado, "total": float(p.total), "created_at": p.created_at,
         })
-    for c in db.query(models.CompraCurso).order_by(models.CompraCurso.created_at.desc()).limit(5).all():
-        recientes.append({
-            "id": c.id, "tipo": "curso", "sucursal_id": None,
-            "estado": c.estado_pago, "total": float(c.monto), "created_at": c.created_at,
-        })
-    recientes.sort(key=lambda r: r["created_at"], reverse=True)
     recientes = recientes[:5]
 
     return {
         "ventas_totales": round(ventas_totales, 2),
-        "pedidos_pasteles": len(pedidos_mes),
+        "pedidos_pasteles": pedidos_con_producto,
         "cursos_vendidos": len(compras_mes),
         "ticket_promedio": ticket_promedio,
         "ventas_por_semana": ventas_por_semana,
