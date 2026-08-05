@@ -125,6 +125,15 @@
           <div class="upload-progress-text" id="curso-video-progress-text">Subiendo... 0%</div>
         </div>
         <span class="upload-status" id="curso-video-status"></span>
+
+        <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+          <div style="flex:1; height:1px; background:var(--line);"></div>
+          <span style="font-size:11px; color:var(--grey);">O</span>
+          <div style="flex:1; height:1px; background:var(--line);"></div>
+        </div>
+        <label class="small" style="margin-top:12px; display:block;">Link de YouTube (no listado) — para videos largos</label>
+        <input type="text" id="curso-video-youtube" placeholder="https://youtu.be/..." style="margin-bottom:6px;">
+        <p class="helper" style="font-size:11px;">Sube el video como "No listado" en YouTube y pega aquí el link. Ideal para tutoriales largos.</p>
       </div>
 
       <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:20px;">
@@ -200,12 +209,21 @@
       document.getElementById('curso-pdf-trigger').style.display = 'flex';
     }
 
-    document.getElementById('curso-video-url').value = curso ? (curso.archivo_video_url || '') : '';
+    const videoUrl = curso ? (curso.archivo_video_url || '') : '';
+    const esVideoYoutube = /youtu\.?be/.test(videoUrl);
+    document.getElementById('curso-video-url').value = videoUrl;
     document.getElementById('curso-video-file').value = '';
+    document.getElementById('curso-video-youtube').value = esVideoYoutube ? videoUrl : '';
     document.getElementById('curso-video-status').textContent = '';
+    document.getElementById('curso-video-status').className = 'upload-status';
     document.getElementById('curso-video-progress-wrap').style.display = 'none';
-    if (curso && curso.archivo_video_url) {
-      document.getElementById('curso-video-name').textContent = curso.archivo_video_url.split('/').pop();
+
+    if (videoUrl && esVideoYoutube) {
+      document.getElementById('curso-video-result').style.display = 'none';
+      document.getElementById('curso-video-trigger').style.display = 'none';
+      document.getElementById('curso-video-status').textContent = '✓ Usando video de YouTube';
+    } else if (videoUrl) {
+      document.getElementById('curso-video-name').textContent = videoUrl.split('/').pop();
       document.getElementById('curso-video-result').style.display = 'flex';
       document.getElementById('curso-video-trigger').style.display = 'none';
     } else {
@@ -318,6 +336,23 @@
       status.textContent = 'Error al subir el PDF. Intenta de nuevo.';
     }
   });
+
+
+  document.getElementById('curso-video-youtube').addEventListener('input', function (e) {
+  const url = e.target.value.trim();
+  const esYoutube = /youtu\.?be/.test(url);
+  if (esYoutube) {
+    document.getElementById('curso-video-url').value = url;
+    document.getElementById('curso-video-trigger').style.display = 'none';
+    document.getElementById('curso-video-result').style.display = 'none';
+    document.getElementById('curso-video-status').className = 'upload-status';
+    document.getElementById('curso-video-status').textContent = '✓ Usando video de YouTube';
+  } else if (url === '') {
+    document.getElementById('curso-video-status').textContent = '';
+    document.getElementById('curso-video-trigger').style.display =
+      document.getElementById('curso-video-url').value ? 'none' : 'flex';
+  }
+});
 
   document.getElementById('curso-video-file').addEventListener('change', async function (e) {
     const archivo = e.target.files[0];

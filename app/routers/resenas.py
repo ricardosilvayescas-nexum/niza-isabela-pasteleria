@@ -6,6 +6,7 @@ pero requieren aprobación del admin antes de mostrarse públicamente.
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from sqlalchemy import case
 from .. import models, schemas, security
 from ..database import get_db
 
@@ -69,12 +70,10 @@ def listar_resenas_admin(
     _admin: models.Usuario = Depends(security.get_current_admin),
 ):
     """Solo admin — bandeja de moderación, pendientes primero."""
+    orden_prioridad = case((models.Resena.estado == "pendiente", 0), else_=1)
     return (
         db.query(models.Resena)
-        .order_by(
-            (models.Resena.estado == "pendiente").desc(),
-            models.Resena.created_at.desc(),
-        )
+        .order_by(orden_prioridad, models.Resena.created_at.desc())
         .all()
     )
 

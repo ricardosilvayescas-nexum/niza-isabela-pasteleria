@@ -43,7 +43,9 @@
             </div>
           </div>
         </div>
-        ${c.archivo_video_url ? `
+        ${c.archivo_video_url && esUrlYoutube(c.archivo_video_url) ? `
+          <iframe class="video-player" style="width:100%; aspect-ratio:16/9; border:none; border-radius:8px;" src="${urlEmbedYoutube(c.archivo_video_url)}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+        ` : c.archivo_video_url ? `
           <video class="video-player" controls preload="metadata" src="${c.archivo_video_url}"></video>
           <a class="btn btn-outline" style="margin-top:10px; display:inline-block; font-size:12px; padding:8px 16px;" href="${c.archivo_video_url}" download target="_blank" rel="noopener">⬇ Descargar video</a>
         ` : ''}

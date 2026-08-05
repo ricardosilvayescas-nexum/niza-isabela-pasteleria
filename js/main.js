@@ -706,6 +706,19 @@ function wireQuickViewModalClose() {
 }
 
 
+function esUrlYoutube(url) {
+  return /youtu\.?be/.test(url || '');
+}
+
+function urlEmbedYoutube(url) {
+  let id = '';
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  const longMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (shortMatch) id = shortMatch[1];
+  else if (longMatch) id = longMatch[1];
+  return `https://www.youtube.com/embed/${id}`;
+}
+
 var cvResenaEstrellasSeleccionadas = 0;
 
 function renderCvEstrellasInput() {
