@@ -36,8 +36,8 @@
 
     <div class="admin-panel">
       <table class="admin-table" id="resenas-table">
-        <tr><th>Producto</th><th>Cliente</th><th>Calificación</th><th>Comentario</th><th>Fecha</th><th>Estado</th><th></th></tr>
-      </table>
+        <tr><th>Producto</th><th>Cliente</th><th>Calificación</th><th>Comentario</th><th>Fecha</th><th>Estado</th></tr>
+    </table>
     </div>
   </div>
 </div>
@@ -77,15 +77,11 @@
       const res = await authFetch(`${API_BASE_URL}/api/resenas/admin/todas`);
       if (!res.ok) throw new Error();
       const resenas = await res.json();
-      tabla.innerHTML = '<tr><th>Producto</th><th>Cliente</th><th>Calificación</th><th>Comentario</th><th>Fecha</th><th>Estado</th><th></th></tr>' +
+      tabla.innerHTML = '<tr><th>Producto</th><th>Cliente</th><th>Calificación</th><th>Comentario</th><th>Fecha</th><th>Estado</th></tr>' +
         resenas.map(function (r) {
           const nombreProducto = r.producto_id
             ? (productosCacheResenas[r.producto_id] || '—')
             : `${cursosCacheResenas[r.curso_id] || '—'} (curso)`;
-          const acciones = r.estado === 'pendiente'
-            ? `<button class="btn-mini" onclick="moderarResena('${r.id}', 'aprobada')">Aprobar</button>
-               <button class="btn-mini" onclick="moderarResena('${r.id}', 'rechazada')">Rechazar</button>`
-            : '';
           return `
             <tr>
               <td>${nombreProducto}</td>
@@ -98,7 +94,6 @@
                     <option value="aprobada" ${r.estado === 'aprobada' ? 'selected' : ''}>Aprobada</option>
                     <option value="rechazada" ${r.estado === 'rechazada' ? 'selected' : ''}>Rechazada</option>
                   </select></td>
-              <td>${acciones}</td>
             </tr>`;
         }).join('');
     } catch {
