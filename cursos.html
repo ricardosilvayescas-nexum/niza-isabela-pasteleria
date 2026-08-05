@@ -72,26 +72,25 @@
       <div class="price" id="cvPrice">$0 MXN</div>
       <p id="cvDesc">Descripción</p>
       <button class="btn btn-primary btn-block" id="cvAddToCart" type="button">Agregar al carrito</button>
+
+      <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--line);">
+        <h4 style="font-size:14px; margin-bottom:14px;">Reseñas de clientes</h4>
+        <div id="cvResenasLista"><p style="font-size:12.5px; color:var(--grey);">Cargando…</p></div>
+
+        <button type="button" id="cvMostrarFormResena" class="upload-change-btn" style="margin-top:12px;">+ Dejar una reseña</button>
+
+        <div id="cvFormResena" style="display:none; margin-top:14px;">
+          <label class="small">Tu nombre</label>
+          <input type="text" id="cvResenaNombre" style="margin-bottom:10px;">
+          <label class="small">Calificación</label>
+          <div id="cvResenaEstrellas" style="margin-bottom:10px; font-size:22px; color:#D4A017; cursor:pointer;"></div>
+          <label class="small">Comentario</label>
+          <textarea id="cvResenaComentario" style="margin-bottom:12px;"></textarea>
+          <button type="button" class="btn btn-outline btn-block" id="cvEnviarResena">Enviar reseña</button>
+          <p style="font-size:11.5px; color:var(--grey); margin-top:8px;">Tu reseña se publicará después de ser revisada.</p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-
-<div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--line);">
-  <h4 style="font-size:14px; margin-bottom:14px;">Reseñas de clientes</h4>
-  <div id="cvResenasLista"><p style="font-size:12.5px; color:var(--grey);">Cargando…</p></div>
-
-  <button type="button" id="cvMostrarFormResena" class="upload-change-btn" style="margin-top:12px;">+ Dejar una reseña</button>
-
-  <div id="cvFormResena" style="display:none; margin-top:14px;">
-    <label class="small">Tu nombre</label>
-    <input type="text" id="cvResenaNombre" style="margin-bottom:10px;">
-    <label class="small">Calificación</label>
-    <div id="cvResenaEstrellas" style="margin-bottom:10px; font-size:22px; color:#D4A017; cursor:pointer;"></div>
-    <label class="small">Comentario</label>
-    <textarea id="cvResenaComentario" style="margin-bottom:12px;"></textarea>
-    <button type="button" class="btn btn-outline btn-block" id="cvEnviarResena">Enviar reseña</button>
-    <p style="font-size:11.5px; color:var(--grey); margin-top:8px;">Tu reseña se publicará después de ser revisada.</p>
   </div>
 </div>
 
