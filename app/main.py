@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from .routers import productos, cursos, cotizaciones, pedidos, configuracion, auth, contacto, sucursales, reportes, pagos, uploads
+from .routers import productos, cursos, cotizaciones, pedidos, configuracion, auth, contacto, sucursales, reportes, pagos, uploads, resenas
 
 app = FastAPI(
     title="Niza Isabela — API",
@@ -34,6 +34,7 @@ app.include_router(sucursales.router)
 app.include_router(reportes.router)
 app.include_router(pagos.router)
 app.include_router(uploads.router)
+app.include_router(resenas.router)
 
 @app.get("/")
 def raiz():

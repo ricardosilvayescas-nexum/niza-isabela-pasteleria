@@ -174,3 +174,13 @@ class ContactoMensaje(Base):
     fecha_envio = Column("FechaEnvio", DateTime, server_default=func.now())
     leido = Column("Leido", Boolean, default=False)
 
+class Resena(Base):
+    __tablename__ = "resenas"
+    id = Column(UNIQUEIDENTIFIER(as_uuid=False), primary_key=True, default=gen_uuid)
+    producto_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("productos.id"), nullable=True)
+    curso_id = Column(UNIQUEIDENTIFIER(as_uuid=False), ForeignKey("cursos.id"), nullable=True)
+    nombre_cliente = Column(String(100), nullable=False)
+    calificacion = Column(Integer, nullable=False)
+    comentario = Column(String(1000), nullable=False)
+    estado = Column(String(12), nullable=False, default="pendiente")
+    created_at = Column(DateTime, server_default=func.now())

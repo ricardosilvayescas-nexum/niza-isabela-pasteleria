@@ -75,13 +75,29 @@
         <div class="options" id="qvTamanoOptions"></div>
       </div>
       <div class="qty-row">
-        <div class="qty-box">
-          <button class="qty-minus" type="button">−</button>
-          <span class="qty-value">1</span>
-          <button class="qty-plus" type="button">+</button>
-        </div>
+        <button class="qty-minus" type="button">−</button>
+        <span class="qty-value">1</span>
+        <button class="qty-plus" type="button">+</button>
       </div>
       <button class="btn btn-primary btn-block" id="qvAddToCart">Agregar al carrito</button>
+
+      <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--line);">
+        <h4 style="font-size:14px; margin-bottom:14px;">Reseñas de clientes</h4>
+        <div id="qvResenasLista"><p style="font-size:12.5px; color:var(--grey);">Cargando…</p></div>
+
+        <button type="button" id="qvMostrarFormResena" class="upload-change-btn" style="margin-top:12px;">+ Dejar una reseña</button>
+
+        <div id="qvFormResena" style="display:none; margin-top:14px;">
+          <label class="small">Tu nombre</label>
+          <input type="text" id="qvResenaNombre" style="margin-bottom:10px;">
+          <label class="small">Calificación</label>
+          <div id="qvResenaEstrellas" style="margin-bottom:10px; font-size:22px; color:#D4A017; cursor:pointer;"></div>
+          <label class="small">Comentario</label>
+          <textarea id="qvResenaComentario" style="margin-bottom:12px;"></textarea>
+          <button type="button" class="btn btn-outline btn-block" id="qvEnviarResena">Enviar reseña</button>
+          <p style="font-size:11.5px; color:var(--grey); margin-top:8px;">Tu reseña se publicará después de ser revisada.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

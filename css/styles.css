@@ -621,3 +621,14 @@ nav.site-nav.scrolled{
 .cropper-img-wrap{ max-height:55vh; overflow:hidden; background:#000; border-radius:6px; }
 .cropper-img-wrap img{ display:block; max-width:100%; }
 .cropper-actions{ display:flex; gap:10px; justify-content:flex-end; }
+
+
+
+.qv-estrella{ cursor:pointer; }
+.qv-estrella.filled{ color:#D4A017; }
+.qv-estrella:not(.filled){ color:var(--line); }
+.resena-item{ padding:12px 0; border-bottom:1px solid var(--line); }
+.resena-item:last-child{ border-bottom:none; }
+.resena-estrellas{ color:#D4A017; font-size:13px; }
+.resena-nombre{ font-size:12.5px; font-weight:600; margin-top:2px; }
+.resena-comentario{ font-size:12.5px; color:var(--grey); margin-top:4px; line-height:1.6; }

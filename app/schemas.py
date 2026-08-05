@@ -242,3 +242,27 @@ class ProductoOpcionCreate(BaseModel):
     tipo_opcion: str  # 'tamaño' | 'sabor' | 'relleno' | 'decoracion'
     nombre: str
     precio_extra: float = 0
+
+
+class ResenaCreate(BaseModel):
+    producto_id: Optional[str] = None
+    curso_id: Optional[str] = None
+    nombre_cliente: str
+    calificacion: int
+    comentario: str
+
+
+class ResenaOut(BaseModel):
+    id: str
+    producto_id: Optional[str] = None
+    curso_id: Optional[str] = None
+    nombre_cliente: str
+    calificacion: int
+    comentario: str
+    estado: str
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ResenaAdminUpdate(BaseModel):
+    estado: str  # 'aprobada' | 'rechazada'

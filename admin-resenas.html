@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" style="background-color:#FFFDEE;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FFFDEE">
+<title>Reseñas — Panel Admin Niza Isabela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background-color:#FFFDEE;">
+
+<div class="app">
+  <div class="sidebar">
+    <a class="logo" href="admin.html">Niza <span>Isabela</span></a>
+    <div class="sidebar-nav">
+      <a class="nav-item" href="admin.html">📊 Reportes</a>
+      <a class="nav-item" href="admin-pedidos.html">🧁 Pedidos</a>
+      <a class="nav-item" href="admin-cotizaciones.html">✉️ Cotizaciones</a>
+      <a class="nav-item" href="admin-cursos.html">📄 Cursos</a>
+      <a class="nav-item" href="admin-catalogo.html">🍰 Catálogo</a>
+      <a class="nav-item" href="admin-dudas.html">💬 Dudas</a>
+      <a class="nav-item active" href="admin-resenas.html">⭐ Reseñas</a>
+      <div class="nav-section">Configuración</div>
+      <a class="nav-item" href="admin-sucursales.html">🏪 Sucursales</a>
+      <a class="nav-item" href="admin-ajustes.html">⚙️ Ajustes generales</a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <h1>Reseñas de clientes</h1>
+    </div>
+
+    <div class="admin-panel">
+      <table class="admin-table" id="resenas-table">
+        <tr><th>Producto</th><th>Cliente</th><th>Calificación</th><th>Comentario</th><th>Fecha</th><th>Estado</th><th></th></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script>requireAdmin();</script>
+<script>
+  var productosCacheResenas = {};
+  var cursosCacheResenas = {};
+
+  function estrellas(n) {
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  function claseEstadoResena(estado) {
+    if (estado === 'aprobada') return 'st-verde';
+    if (estado === 'rechazada') return 'st-rojo';
+    return 'st-amarillo';
+  }
+
+  async function cargarProductosCache() {
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/productos/admin/todos`);
+      const productos = await res.json();
+      productos.forEach(function (p) { productosCacheResenas[p.id] = p.nombre; });
+    } catch {}
+    try {
+      const res2 = await authFetch(`${API_BASE_URL}/api/cursos/admin/todos`);
+      const cursos = await res2.json();
+      cursos.forEach(function (c) { cursosCacheResenas[c.id] = c.nombre; });
+    } catch {}
+  }
+
+  async function cargarResenas() {
+    const tabla = document.getElementById('resenas-table');
+    try {
+      const res = await authFetch(`${API_BASE_URL}/api/resenas/admin/todas`);
+      if (!res.ok) throw new Error();
+      const resenas = await res.json();
+      tabla.innerHTML = '<tr><th>Producto</th><th>Cliente</th><th>Calificación</th><th>Comentario</th><th>Fecha</th><th>Estado</th><th></th></tr>' +
+        resenas.map(function (r) {
+          const nombreProducto = r.producto_id
+            ? (productosCacheResenas[r.producto_id] || '—')
+            : `${cursosCacheResenas[r.curso_id] || '—'} (curso)`;
+          const acciones = r.estado === 'pendiente'
+            ? `<button class="btn-mini" onclick="moderarResena('${r.id}', 'aprobada')">Aprobar</button>
+               <button class="btn-mini" onclick="moderarResena('${r.id}', 'rechazada')">Rechazar</button>`
+            : '';
+          return `
+            <tr>
+              <td>${nombreProducto}</td>
+              <td>${r.nombre_cliente}</td>
+              <td style="color:#D4A017;">${estrellas(r.calificacion)}</td>
+              <td style="max-width:260px;">${r.comentario}</td>
+              <td>${new Date(r.created_at).toLocaleDateString('es-MX')}</td>
+              <td><select class="status-select ${claseEstadoResena(r.estado)}" onchange="moderarResena('${r.id}', this.value, this)">
+                    <option value="pendiente" ${r.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="aprobada" ${r.estado === 'aprobada' ? 'selected' : ''}>Aprobada</option>
+                    <option value="rechazada" ${r.estado === 'rechazada' ? 'selected' : ''}>Rechazada</option>
+                  </select></td>
+              <td>${acciones}</td>
+            </tr>`;
+        }).join('');
+    } catch {
+      tabla.innerHTML = '<tr><td colspan="7">No se pudieron cargar las reseñas.</td></tr>';
+    }
+  }
+
+  async function moderarResena(id, nuevoEstado, selectEl) {
+    await authFetch(`${API_BASE_URL}/api/resenas/admin/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: nuevoEstado }),
+    });
+    if (selectEl) {
+      selectEl.classList.remove('st-rojo', 'st-amarillo', 'st-verde');
+      selectEl.classList.add(claseEstadoResena(nuevoEstado));
+    }
+    cargarResenas();
+  }
+
+  (async function () {
+    await cargarProductosCache();
+    cargarResenas();
+  })();
+</script>
+</body>
+</html>

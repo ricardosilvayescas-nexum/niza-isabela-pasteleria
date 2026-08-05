@@ -665,6 +665,11 @@ function wireQuickViewLinks() {
       try { opciones = JSON.parse(decodeURIComponent(link.dataset.opciones || '%5B%5D')); } catch (err) {}
       renderQuickViewTamanos(opciones);
 
+      cargarResenasProducto(link.dataset.id);
+      document.getElementById('qvFormResena').style.display = 'none';
+      resenaEstrellasSeleccionadas = 0;
+      renderQvEstrellasInput();
+
       quickView.classList.add('open');
     });
   });
@@ -700,6 +705,93 @@ function wireQuickViewModalClose() {
   });
 }
 
+
+var cvResenaEstrellasSeleccionadas = 0;
+
+function renderCvEstrellasInput() {
+  var cont = document.getElementById('cvResenaEstrellas');
+  if (!cont) return;
+  var html = '';
+  for (var i = 1; i <= 5; i++) {
+    html += `<span class="qv-estrella ${i <= cvResenaEstrellasSeleccionadas ? 'filled' : ''}" data-val="${i}">★</span>`;
+  }
+  cont.innerHTML = html;
+  cont.querySelectorAll('.qv-estrella').forEach(function (el) {
+    el.addEventListener('click', function () {
+      cvResenaEstrellasSeleccionadas = parseInt(this.dataset.val, 10);
+      renderCvEstrellasInput();
+    });
+  });
+}
+
+async function cargarResenasCurso(cursoId) {
+  var cont = document.getElementById('cvResenasLista');
+  if (!cont) return;
+  cont.innerHTML = '<p style="font-size:12.5px; color:var(--grey);">Cargando…</p>';
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/resenas/curso/${cursoId}`);
+    const resenas = await res.json();
+    if (!resenas.length) {
+      cont.innerHTML = '<p style="font-size:12.5px; color:var(--grey);">Aún no hay reseñas para este curso.</p>';
+      return;
+    }
+    cont.innerHTML = resenas.map(function (r) {
+      var estrellas = '★'.repeat(r.calificacion) + '☆'.repeat(5 - r.calificacion);
+      return `
+        <div class="resena-item">
+          <div class="resena-estrellas">${estrellas}</div>
+          <div class="resena-nombre">${r.nombre_cliente}</div>
+          <div class="resena-comentario">${r.comentario}</div>
+        </div>`;
+    }).join('');
+  } catch {
+    cont.innerHTML = '<p style="font-size:12.5px; color:var(--grey);">No se pudieron cargar las reseñas.</p>';
+  }
+}
+
+var resenaEstrellasSeleccionadas = 0;
+
+function renderQvEstrellasInput() {
+  var cont = document.getElementById('qvResenaEstrellas');
+  if (!cont) return;
+  var html = '';
+  for (var i = 1; i <= 5; i++) {
+    html += `<span class="qv-estrella ${i <= resenaEstrellasSeleccionadas ? 'filled' : ''}" data-val="${i}">★</span>`;
+  }
+  cont.innerHTML = html;
+  cont.querySelectorAll('.qv-estrella').forEach(function (el) {
+    el.addEventListener('click', function () {
+      resenaEstrellasSeleccionadas = parseInt(this.dataset.val, 10);
+      renderQvEstrellasInput();
+    });
+  });
+}
+
+async function cargarResenasProducto(productoId) {
+  var cont = document.getElementById('qvResenasLista');
+  if (!cont) return;
+  cont.innerHTML = '<p style="font-size:12.5px; color:var(--grey);">Cargando…</p>';
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/resenas/producto/${productoId}`);
+    const resenas = await res.json();
+    if (!resenas.length) {
+      cont.innerHTML = '<p style="font-size:12.5px; color:var(--grey);">Aún no hay reseñas para este producto.</p>';
+      return;
+    }
+    cont.innerHTML = resenas.map(function (r) {
+      var estrellas = '★'.repeat(r.calificacion) + '☆'.repeat(5 - r.calificacion);
+      return `
+        <div class="resena-item">
+          <div class="resena-estrellas">${estrellas}</div>
+          <div class="resena-nombre">${r.nombre_cliente}</div>
+          <div class="resena-comentario">${r.comentario}</div>
+        </div>`;
+    }).join('');
+  } catch {
+    cont.innerHTML = '<p style="font-size:12.5px; color:var(--grey);">No se pudieron cargar las reseñas.</p>';
+  }
+}
+
 /* ---------- Modal de vista rápida (cursos) ---------- */
 function wireCourseViewLinks() {
   var courseView = document.getElementById('courseView');
@@ -721,6 +813,10 @@ function wireCourseViewLinks() {
         cvPhoto.textContent = 'Portada';
       }
       courseView.dataset.cursoId = link.dataset.id;
+      cargarResenasCurso(link.dataset.id);
+      document.getElementById('cvFormResena').style.display = 'none';
+      cvResenaEstrellasSeleccionadas = 0;
+      renderCvEstrellasInput();
       courseView.dataset.nombre = link.dataset.title;
       courseView.dataset.precioNum = link.dataset.priceNum;
       courseView.classList.add('open');
@@ -814,9 +910,6 @@ async function subirArchivo(archivo, tipo, nombreArchivo) {
   return data.url;
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  // ... todo el resto sigue igual, sin la función adentro ...
-});
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -877,6 +970,96 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       courseView.classList.remove('open');
       mostrarToastCarrito(courseView.dataset.nombre);
+    });
+  }
+
+
+  var btnMostrarForm = document.getElementById('qvMostrarFormResena');
+  if (btnMostrarForm) {
+    btnMostrarForm.addEventListener('click', function () {
+      var form = document.getElementById('qvFormResena');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+
+  var btnEnviarResena = document.getElementById('qvEnviarResena');
+  if (btnEnviarResena) {
+    btnEnviarResena.addEventListener('click', async function () {
+      var quickView = document.getElementById('quickView');
+      var nombre = document.getElementById('qvResenaNombre').value.trim();
+      var comentario = document.getElementById('qvResenaComentario').value.trim();
+
+      if (!nombre || !comentario || resenaEstrellasSeleccionadas === 0) {
+        alert('Completa tu nombre, calificación y comentario.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/resenas/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            producto_id: quickView.dataset.productoId,
+            nombre_cliente: nombre,
+            calificacion: resenaEstrellasSeleccionadas,
+            comentario: comentario,
+          }),
+        });
+        if (!res.ok) throw new Error();
+        document.getElementById('qvResenaNombre').value = '';
+        document.getElementById('qvResenaComentario').value = '';
+        resenaEstrellasSeleccionadas = 0;
+        renderQvEstrellasInput();
+        document.getElementById('qvFormResena').style.display = 'none';
+        alert('¡Gracias! Tu reseña será revisada antes de publicarse.');
+      } catch {
+        alert('Hubo un error al enviar tu reseña. Intenta de nuevo.');
+      }
+    });
+  }
+
+
+  var btnMostrarFormCv = document.getElementById('cvMostrarFormResena');
+  if (btnMostrarFormCv) {
+    btnMostrarFormCv.addEventListener('click', function () {
+      var form = document.getElementById('cvFormResena');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+
+  var btnEnviarResenaCv = document.getElementById('cvEnviarResena');
+  if (btnEnviarResenaCv) {
+    btnEnviarResenaCv.addEventListener('click', async function () {
+      var courseView = document.getElementById('courseView');
+      var nombre = document.getElementById('cvResenaNombre').value.trim();
+      var comentario = document.getElementById('cvResenaComentario').value.trim();
+
+      if (!nombre || !comentario || cvResenaEstrellasSeleccionadas === 0) {
+        alert('Completa tu nombre, calificación y comentario.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/resenas/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            curso_id: courseView.dataset.cursoId,
+            nombre_cliente: nombre,
+            calificacion: cvResenaEstrellasSeleccionadas,
+            comentario: comentario,
+          }),
+        });
+        if (!res.ok) throw new Error();
+        document.getElementById('cvResenaNombre').value = '';
+        document.getElementById('cvResenaComentario').value = '';
+        cvResenaEstrellasSeleccionadas = 0;
+        renderCvEstrellasInput();
+        document.getElementById('cvFormResena').style.display = 'none';
+        alert('¡Gracias! Tu reseña será revisada antes de publicarse.');
+      } catch {
+        alert('Hubo un error al enviar tu reseña. Intenta de nuevo.');
+      }
     });
   }
 
