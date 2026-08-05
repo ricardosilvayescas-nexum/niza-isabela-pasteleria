@@ -241,12 +241,12 @@ textarea{ resize:vertical; min-height:80px; }
 @media(max-width:600px){ .modal{ grid-template-columns:1fr; } .modal-photo{ display:none; } }
 
 /* ===== FOOTER ===== */
-footer.site-footer{ border-top:1px solid var(--line); padding:56px 32px 40px; }
+footer.site-footer{ border-top:none; padding:32px 32px 0; }
 .footer-inner{ max-width:1120px; margin:0 auto; display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:40px; }
 footer h5{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--grey); margin-bottom:16px; font-weight:600; }
 footer p, footer a{ font-size:14px; color:var(--ink); line-height:2; text-decoration:none; display:block; }
 .footer-bottom{ text-align:center; font-size:12px; color:var(--grey); margin-top:50px; }
-.footer-simple{ text-align:center; padding:40px 32px; color:var(--grey); font-size:12px; border-top:1px solid var(--line); }
+.footer-simple{ text-align:center; padding:20px 32px; color:var(--grey); font-size:12px; border-top:1px solid var(--line); margin-top:32px; }
 
 /* ===== ADMIN PANEL ===== */
 .app{ display:grid; grid-template-columns:230px 1fr; min-height:100vh; }
@@ -635,7 +635,7 @@ nav.site-nav.scrolled{
 
 
 /* ===== CARRUSEL DE RESEÑAS DESTACADAS (index.html) ===== */
-.resenas-section{ padding:50px 0 60px; overflow:hidden; }
+.resenas-section{ padding:50px 0 40px; overflow:hidden; }
 .resenas-carrusel-viewport{ overflow:hidden; margin-top:24px; -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .resenas-carrusel-track{
   display:flex; gap:18px; width:max-content;
@@ -647,12 +647,12 @@ nav.site-nav.scrolled{
   to{ transform:translateX(-50%); }
 }
 .resena-card-mini{
-  background:#fff; border:1px solid var(--line); border-radius:10px;
-  padding:20px; width:260px; flex-shrink:0;
+  background:#fff; border:1px solid var(--line); border-radius:12px;
+  padding:28px; width:340px; flex-shrink:0;
 }
-.resena-card-mini .resena-estrellas{ font-size:14px; margin-bottom:8px; }
-.resena-card-mini .resena-comentario{ font-size:12.5px; color:var(--ink); line-height:1.6; margin-bottom:10px; }
-.resena-card-mini .resena-nombre{ font-size:11.5px; color:var(--grey); font-weight:600; }
+.resena-card-mini .resena-estrellas{ font-size:18px; margin-bottom:12px; }
+.resena-card-mini .resena-comentario{ font-size:14.5px; color:var(--ink); line-height:1.7; margin-bottom:14px; }
+.resena-card-mini .resena-nombre{ font-size:13px; color:var(--grey); font-weight:600; }
 @media(max-width:700px){
-  .resena-card-mini{ width:220px; }
+  .resena-card-mini{ width:280px; padding:22px; }
 }
