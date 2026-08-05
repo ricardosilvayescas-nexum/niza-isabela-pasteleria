@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin-*.html
+Disallow: /checkout.html
+Disallow: /cuenta.html
+Disallow: /mis-pedidos.html
+Disallow: /mis-cotizaciones.html
+Disallow: /mis-cursos.html
+
+Sitemap: https://www.nizaisabelapasteleria.com/sitemap.xml

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.nizaisabelapasteleria.com/index.html</loc><priority>1.0</priority></url>
+  <url><loc>https://www.nizaisabelapasteleria.com/catalogo.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.nizaisabelapasteleria.com/cursos.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.nizaisabelapasteleria.com/cotizacion.html</loc><priority>0.7</priority></url>
+  <url><loc>https://www.nizaisabelapasteleria.com/nosotros.html</loc><priority>0.5</priority></url>
+  <url><loc>https://www.nizaisabelapasteleria.com/contacto.html</loc><priority>0.5</priority></url>
+  <url><loc>https://www.nizaisabelapasteleria.com/aviso-privacidad.html</loc><priority>0.2</priority></url>
+</urlset>

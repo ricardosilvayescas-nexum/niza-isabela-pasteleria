@@ -253,14 +253,15 @@ function productCardHTML(p) {
   const precio = esFijo ? `$${Number(p.precio_base).toFixed(0)} MXN` : `Desde $${Number(p.precio_base).toFixed(0)} MXN`;
   const tamanos = (p.opciones || []).filter(o => o.tipo_opcion === 'tamaño');
   const linkAttrs = esFijo
-    ? `href="#" data-quickview data-id="${p.id}" data-price-num="${p.precio_base}" data-title="${p.nombre}" data-price="${precio}" data-desc="${p.descripcion || ''}" data-photo="${p.foto_url || ''}" data-opciones="${encodeURIComponent(JSON.stringify(tamanos))}"`
+    ? `href="#" data-quickview data-id="${p.id}" data-price-num="${p.precio_base}" data-title="${p.nombre}" data-price="${precio}" data-desc="${p.descripcion || ''}" data-photo="${p.foto_url || ''}" data-opciones="${encodeURIComponent(JSON.stringify(tamanos))}" data-agotado="${p.agotado ? '1' : ''}"`
     : `href="cotizacion.html?producto=${p.id}"`;
   const linkText = esFijo ? 'Ver más →' : 'Cotizar →';
   const photoClass = esFijo ? 'card-photo' : 'card-photo alt';
   const badge = esFijo ? '' : '<span class="badge">Personalizable</span>';
+  const badgeAgotado = p.agotado ? '<span class="badge" style="background:#4A3722; color:#fff;">Agotado</span>' : '';
   return `
     <div class="card" data-category="${esFijo ? 'fijo' : 'personalizado'}">
-      <div class="${photoClass}" style="${p.foto_url ? `background-image:url('${p.foto_url}'); background-size:cover; background-position:center;` : ''}">${p.foto_url ? '' : badge + 'FOTO — ' + p.nombre}</div>
+      <div class="${photoClass}" style="${p.foto_url ? `background-image:url('${p.foto_url}'); background-size:cover; background-position:center;` : ''} ${p.agotado ? 'opacity:.55;' : ''}">${badgeAgotado}${p.foto_url ? '' : badge + 'FOTO — ' + p.nombre}</div>
       <h4>${p.nombre}</h4>
       <div class="price">${precio}</div>
       <a class="link" ${linkAttrs}>${linkText}</a>
@@ -640,9 +641,25 @@ function wireQuickViewLinks() {
       quickView.dataset.productoId = link.dataset.id;
       quickView.dataset.precioNum = link.dataset.priceNum;
       quickView.dataset.nombre = link.dataset.title;
+      quickView.dataset.agotado = link.dataset.agotado || '';
 
       var qtyValue = quickView.querySelector('.qty-value');
       if (qtyValue) qtyValue.textContent = '1';
+
+      var qvAddBtn2 = document.getElementById('qvAddToCart');
+      if (qvAddBtn2) {
+        if (link.dataset.agotado) {
+          qvAddBtn2.disabled = true;
+          qvAddBtn2.textContent = 'Agotado temporalmente';
+          qvAddBtn2.style.opacity = '.6';
+          qvAddBtn2.style.cursor = 'not-allowed';
+        } else {
+          qvAddBtn2.disabled = false;
+          qvAddBtn2.textContent = 'Agregar al carrito';
+          qvAddBtn2.style.opacity = '';
+          qvAddBtn2.style.cursor = '';
+        }
+      }
 
       var opciones = [];
       try { opciones = JSON.parse(decodeURIComponent(link.dataset.opciones || '%5B%5D')); } catch (err) {}
@@ -828,6 +845,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (qvAddBtn) {
     qvAddBtn.addEventListener('click', function () {
       var quickView = document.getElementById('quickView');
+      if (quickView.dataset.agotado) return; // seguridad extra, además del disabled visual
       var qtyEl = quickView.querySelector('.qty-value');
       var cantidad = qtyEl ? parseInt(qtyEl.textContent, 10) : 1;
       var tamanoSeleccionado = quickView.querySelector('#qvTamanoOptions .opt.selected');

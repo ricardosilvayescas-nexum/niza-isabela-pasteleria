@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light only">
 <meta name="theme-color" content="#FFFDEE">
+<link rel="icon" type="image/jpeg" href="https://nizaisabelastorage.blob.core.windows.net/archivos-publicos/imagen/b8497190-4fa9-45da-a07a-f468cb28aed8.jpg">
 <title>Catálogo — Panel Admin Niza Isabela</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -95,8 +96,11 @@
         </div>
         <span class="upload-status" id="producto-foto-status"></span>
       </div>
-      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:20px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:10px;">
         <input type="checkbox" id="producto-activo"> Producto activo (visible en el catálogo)
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:20px;">
+        <input type="checkbox" id="producto-agotado"> Agotado temporalmente (se muestra pero no se puede comprar)
       </label>
       <div id="producto-tamanos-wrap" style="display:none; margin-bottom:20px;">
         <label class="small">Tamaños disponibles (solo catálogo fijo)</label>
@@ -130,7 +134,7 @@
           <div class="item-title">${p.nombre}</div>
           <div class="item-sub">${p.tipo === 'fijo' ? 'Catálogo fijo' : 'Personalizable'}</div>
         </div>
-        <div style="font-size:13px; font-weight:600;">${p.activo ? precio : '—'}</div>
+        <div style="font-size:13px; font-weight:600;">${p.activo ? precio : '—'}${p.agotado ? ' <span style="color:#A0522D; font-size:11px;">(agotado)</span>' : ''}</div>
         <div class="toggle ${p.activo ? 'on' : ''}" title="${p.activo ? 'Activo' : 'Inactivo'}" onclick="toggleProductoActivo('${p.id}')"></div>
         <button class="btn-mini" onclick="editarProducto('${p.id}')">Editar</button>
       </div>`;
@@ -175,6 +179,7 @@
       document.getElementById('producto-foto-trigger').style.display = 'flex';
     }
     document.getElementById('producto-activo').checked = producto ? producto.activo : true;
+    document.getElementById('producto-agotado').checked = producto ? (producto.agotado || false) : false;
     document.getElementById('producto-tamanos-wrap').style.display = 'none';
     document.getElementById('producto-modal').classList.add('open');
   }
@@ -244,6 +249,7 @@
       precio_base: parseFloat(document.getElementById('producto-precio').value) || null,
       foto_url: document.getElementById('producto-foto').value,
       activo: document.getElementById('producto-activo').checked,
+      agotado: document.getElementById('producto-agotado').checked,
     };
     const url = id ? `${API_BASE_URL}/api/productos/admin/${id}` : `${API_BASE_URL}/api/productos/admin`;
     try {

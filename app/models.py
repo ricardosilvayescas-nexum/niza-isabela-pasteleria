@@ -46,6 +46,7 @@ class Producto(Base):
     precio_base = Column(Numeric(10, 2))
     foto_url = Column(String(500))
     activo = Column(Boolean, default=True)
+    agotado = Column(Boolean, default=False)
     created_at = Column(DateTime, server_default=func.now())
     opciones = relationship("ProductoOpcion", back_populates="producto")
 

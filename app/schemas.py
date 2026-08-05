@@ -24,6 +24,7 @@ class ProductoOut(BaseModel):
     precio_base: Optional[float] = None
     foto_url: Optional[str] = None
     activo: bool
+    agotado: bool = False
     opciones: List[ProductoOpcionOut] = []
     model_config = ConfigDict(from_attributes=True)
 
@@ -204,6 +205,7 @@ class ProductoCreate(BaseModel):
     precio_base: Optional[float] = None
     foto_url: Optional[str] = None
     activo: bool = True
+    agotado: bool = False
 
 
 class ProductoUpdate(BaseModel):
@@ -213,6 +215,7 @@ class ProductoUpdate(BaseModel):
     precio_base: Optional[float] = None
     foto_url: Optional[str] = None
     activo: bool
+    agotado: bool = False
 
 
 class CursoCreate(BaseModel):
