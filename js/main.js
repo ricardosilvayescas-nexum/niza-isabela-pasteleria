@@ -805,6 +805,35 @@ async function cargarResenasProducto(productoId) {
   }
 }
 
+
+async function cargarResenasDestacadas() {
+  const wrap = document.getElementById('resenas-destacadas-wrap');
+  const track = document.getElementById('resenas-carrusel-track');
+  if (!wrap || !track) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/resenas/destacadas`);
+    const resenas = await res.json();
+    if (!resenas.length) return; // se queda oculto si no hay reseñas todavía
+
+    const tarjetas = resenas.map(function (r) {
+      const estrellas = '★'.repeat(r.calificacion) + '☆'.repeat(5 - r.calificacion);
+      return `
+        <div class="resena-card-mini">
+          <div class="resena-estrellas" style="color:#D4A017;">${estrellas}</div>
+          <div class="resena-comentario">"${r.comentario}"</div>
+          <div class="resena-nombre">— ${r.nombre_cliente}</div>
+        </div>`;
+    }).join('');
+
+    // Se duplica el contenido para que el loop de la animación sea continuo, sin salto visible
+    track.innerHTML = tarjetas + tarjetas;
+    wrap.style.display = 'block';
+  } catch {
+    // si falla, simplemente se queda oculto — no es crítico para la página
+  }
+}
+
 /* ---------- Modal de vista rápida (cursos) ---------- */
 function wireCourseViewLinks() {
   var courseView = document.getElementById('courseView');
@@ -945,6 +974,7 @@ document.addEventListener('DOMContentLoaded', function () {
     btnPagar.addEventListener('click', crearPedidoDesdeCarrito);
   }
 
+  cargarResenasDestacadas();
   actualizarContadorCarrito();
 
   var qvAddBtn = document.getElementById('qvAddToCart');

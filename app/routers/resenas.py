@@ -64,6 +64,17 @@ def resenas_aprobadas_de_curso(curso_id: str, db: Session = Depends(get_db)):
     )
 
 
+@router.get("/destacadas", response_model=List[schemas.ResenaOut])
+def resenas_destacadas(db: Session = Depends(get_db)):
+    """Público — mejores reseñas aprobadas de todo el sitio (productos y cursos), para el carrusel del inicio."""
+    return (
+        db.query(models.Resena)
+        .filter(models.Resena.estado == "aprobada", models.Resena.calificacion >= 4)
+        .order_by(models.Resena.calificacion.desc(), models.Resena.created_at.desc())
+        .limit(10)
+        .all()
+    )
+
 @router.get("/admin/todas", response_model=List[schemas.ResenaOut])
 def listar_resenas_admin(
     db: Session = Depends(get_db),
