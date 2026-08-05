@@ -17,41 +17,80 @@
     <a class="logo" href="index.html"><img src="https://nizaisabelastorage.blob.core.windows.net/archivos-publicos/imagen/b8497190-4fa9-45da-a07a-f468cb28aed8.jpg" alt="Niza Isabela Pastelería" class="nav-logo-img"></a>
 </nav>
 
-<div class="form-wrap">
+<div class="form-wrap" style="max-width:900px;">
   <a class="back-link" href="cuenta.html">← Volver a mi cuenta</a>
   <div class="form-head">
     <div class="eyebrow">Mi cuenta</div>
     <h1>Mis cursos</h1>
   </div>
 
-  <div id="lista-cursos"><p style="text-align:center; color:var(--grey);">Cargando…</p></div>
+  <div class="mis-cursos-grid" id="lista-cursos"><p style="text-align:center; color:var(--grey); grid-column:1/-1;">Cargando…</p></div>
+</div>
+
+<!-- MODAL PARA VER EL CONTENIDO DE UN CURSO -->
+<div class="modal-overlay" id="mc-modal">
+  <div class="modal" style="grid-template-columns:1fr; max-width:640px;">
+    <button class="modal-close" onclick="cerrarModalMisCursos()">✕</button>
+    <div class="modal-body">
+      <h3 id="mc-titulo" style="margin-bottom:20px;"></h3>
+      <div id="mc-contenido"></div>
+    </div>
+  </div>
 </div>
 
 <footer class="footer-simple">© Niza Isabela Pastelería — Amecameca, México · <a href="aviso-privacidad.html" style="color:inherit;">Aviso de privacidad</a></footer>
 
 <script src="js/main.js"></script>
 <script>
-  function cursoItemHTML(c) {
+  var misCursosCache = [];
+
+  function esUrlYoutubeLocal(url) {
+    return /youtu\.?be/.test(url || '');
+  }
+
+  function urlEmbedYoutubeLocal(url) {
+    let id = '';
+    const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+    const longMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+    if (shortMatch) id = shortMatch[1];
+    else if (longMatch) id = longMatch[1];
+    return `https://www.youtube.com/embed/${id}`;
+  }
+
+  function cursoCardHTML(c, index) {
     return `
-      <div class="detalle-item-card">
-        <div class="detalle-item-header">
-          <div style="display:flex; gap:14px; align-items:center;">
-            ${c.portada_url ? `<img src="${c.portada_url}" alt="${c.nombre}" style="width:56px; height:56px; border-radius:8px; object-fit:cover; flex-shrink:0;">` : ''}
-            <div>
-              <div class="detalle-item-titulo">${c.nombre}</div>
-              <div class="detalle-item-fecha">Comprado el ${new Date(c.comprado_el).toLocaleDateString('es-MX')}</div>
-            </div>
-          </div>
-        </div>
-        ${c.archivo_video_url && esUrlYoutube(c.archivo_video_url) ? `
-          <iframe class="video-player" style="width:100%; aspect-ratio:16/9; border:none; border-radius:8px;" src="${urlEmbedYoutube(c.archivo_video_url)}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-        ` : c.archivo_video_url ? `
-          <video class="video-player" controls preload="metadata" src="${c.archivo_video_url}"></video>
-          <a class="btn btn-outline" style="margin-top:10px; display:inline-block; font-size:12px; padding:8px 16px;" href="${c.archivo_video_url}" download target="_blank" rel="noopener">⬇ Descargar video</a>
-        ` : ''}
-        ${c.archivo_pdf_url ? `<a class="btn btn-outline" style="margin-top:14px; display:inline-block;" href="${c.archivo_pdf_url}" target="_blank" rel="noopener">📄 Descargar PDF</a>` : ''}
-        ${!c.archivo_video_url && !c.archivo_pdf_url ? '<p style="font-size:13px; color:var(--grey);">El material de este curso aún no está disponible.</p>' : ''}
+      <div class="mis-curso-card" onclick="abrirModalMisCursos(${index})">
+        <div class="mis-curso-thumb" style="${c.portada_url ? `background-image:url('${c.portada_url}')` : ''}"></div>
+        <h4>${c.nombre}</h4>
+        <div class="fecha">Comprado el ${new Date(c.comprado_el).toLocaleDateString('es-MX')}</div>
       </div>`;
+  }
+
+  function abrirModalMisCursos(index) {
+    const c = misCursosCache[index];
+    document.getElementById('mc-titulo').textContent = c.nombre;
+
+    let html = '';
+    if (c.archivo_video_url && esUrlYoutubeLocal(c.archivo_video_url)) {
+      html += `<iframe class="video-player" style="width:100%; aspect-ratio:16/9; border:none; border-radius:8px;" src="${urlEmbedYoutubeLocal(c.archivo_video_url)}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+    } else if (c.archivo_video_url) {
+      html += `<video class="video-player" controls preload="metadata" src="${c.archivo_video_url}"></video>
+        <a class="btn btn-outline" style="margin-top:10px; display:inline-block; font-size:12px; padding:8px 16px;" href="${c.archivo_video_url}" download target="_blank" rel="noopener">⬇ Descargar video</a>`;
+    }
+    if (c.archivo_pdf_url) {
+      html += `<a class="btn btn-outline" style="margin-top:14px; display:block; text-align:center;" href="${c.archivo_pdf_url}" target="_blank" rel="noopener">📄 Descargar PDF</a>`;
+    }
+    if (!c.archivo_video_url && !c.archivo_pdf_url) {
+      html = '<p style="font-size:13px; color:var(--grey);">El material de este curso aún no está disponible.</p>';
+    }
+
+    document.getElementById('mc-contenido').innerHTML = html;
+    document.getElementById('mc-modal').classList.add('open');
+  }
+
+  function cerrarModalMisCursos() {
+    document.getElementById('mc-modal').classList.remove('open');
+    document.getElementById('mc-contenido').innerHTML = ''; // detiene el video al cerrar
   }
 
   (async function () {
@@ -61,12 +100,12 @@
     const cont = document.getElementById('lista-cursos');
     try {
       const res = await authFetch(`${API_BASE_URL}/api/cursos/mis-cursos/todos`);
-      const cursos = await res.json();
-      cont.innerHTML = cursos.length
-        ? cursos.map(cursoItemHTML).join('')
-        : '<p style="text-align:center; color:var(--grey);">Aún no has comprado cursos.</p>';
+      misCursosCache = await res.json();
+      cont.innerHTML = misCursosCache.length
+        ? misCursosCache.map(cursoCardHTML).join('')
+        : '<p style="text-align:center; color:var(--grey); grid-column:1/-1;">Aún no has comprado cursos.</p>';
     } catch {
-      cont.innerHTML = '<p style="text-align:center; color:var(--grey);">No se pudieron cargar tus cursos.</p>';
+      cont.innerHTML = '<p style="text-align:center; color:var(--grey); grid-column:1/-1;">No se pudieron cargar tus cursos.</p>';
     }
   })();
 </script>
