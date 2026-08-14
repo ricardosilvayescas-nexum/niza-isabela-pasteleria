@@ -676,3 +676,12 @@ nav.site-nav.scrolled{
 @media(max-width:700px){
   .mis-cursos-grid{ grid-template-columns:repeat(2, 1fr); }
 }
+
+
+/* ===== LAYOUT DE 2 COLUMNAS EN AJUSTES ===== */
+.ajustes-columnas{
+  display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;
+}
+@media(max-width:900px){
+  .ajustes-columnas{ grid-template-columns:1fr; }
+}
