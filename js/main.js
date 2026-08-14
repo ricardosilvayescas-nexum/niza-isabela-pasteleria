@@ -952,7 +952,18 @@ async function subirArchivo(archivo, tipo, nombreArchivo) {
   return data.url;
 }
 
-  async function aplicarImagenDinamica(elementId, claveConfig) {
+async function obtenerConfig(clave) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/configuracion/${clave}`);
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.valor;
+  } catch {
+    return '';
+  }
+}
+
+async function aplicarImagenDinamica(elementId, claveConfig) {
   const el = document.getElementById(elementId);
   if (!el) return;
   const url = await obtenerConfig(claveConfig);
@@ -979,19 +990,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-
-
-
-async function obtenerConfig(clave) {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/configuracion/${clave}`);
-    if (!res.ok) return '';
-    const data = await res.json();
-    return data.valor;
-  } catch {
-    return '';
-  }
-}
 
 
   aplicarImagenDinamica('hero-photo-dinamico', 'imagen_hero_index');
