@@ -953,6 +953,7 @@ async function subirArchivo(archivo, tipo, nombreArchivo) {
 }
 
 
+
 document.addEventListener('DOMContentLoaded', function () {
 
   var tipoEntregaOptions = document.getElementById('tipo-entrega-options');
@@ -968,6 +969,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  async function aplicarImagenDinamica(elementId, claveConfig) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const url = await obtenerConfig(claveConfig);
+  if (url) {
+    el.style.backgroundImage = `url('${url}')`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+  }
+}
+
+
+  aplicarImagenDinamica('hero-photo-dinamico', 'imagen_hero_index');
+  aplicarImagenDinamica('about-photo-dinamico', 'imagen_about_index');
+  aplicarImagenDinamica('foto-nosotros-dinamico', 'imagen_nosotros');
 
   var btnPagar = document.getElementById('btn-pagar');
   if (btnPagar) {

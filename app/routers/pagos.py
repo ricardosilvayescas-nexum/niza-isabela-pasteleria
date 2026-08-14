@@ -127,7 +127,7 @@ async def webhook_mercadopago(request: Request, db: Session = Depends(get_db)):
         pago.referencia_externa = str(payment_id)
 
     if pedido and estado_mp == "approved":
-        pedido.estado = "en_produccion"
+        pedido.estado = "entregado" if pedido.tipo_entrega == "digital" else "en_produccion"
 
     if pedido:
         compras_curso = db.query(models.CompraCurso).filter(models.CompraCurso.pedido_id == pedido.id).all()

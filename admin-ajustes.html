@@ -6,6 +6,7 @@
 <meta name="color-scheme" content="light only">
 <meta name="theme-color" content="#FFFDEE">
 <link rel="icon" type="image/jpeg" href="https://nizaisabelastorage.blob.core.windows.net/archivos-publicos/imagen/b8497190-4fa9-45da-a07a-f468cb28aed8.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 <title>Ajustes generales — Panel Admin Niza Isabela</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -52,6 +53,64 @@
   </div>
 </div>
 
+
+
+<div class="admin-panel" style="max-width:640px; margin-top:20px;">
+  <h3 style="margin-bottom:18px;">Imágenes del sitio</h3>
+
+  <label class="small">Foto principal — Inicio (hero)</label>
+  <div style="margin-bottom:24px;">
+    <input type="file" id="img-hero-file" accept="image/*" hidden>
+    <input type="hidden" id="img-hero-url">
+    <label for="img-hero-file" class="upload-trigger" id="img-hero-trigger">
+      <span class="upload-icon">📷</span><span>Toca para subir una foto</span>
+    </label>
+    <div class="upload-result" id="img-hero-result" style="display:none;">
+      <img id="img-hero-preview" class="upload-thumb">
+      <div class="upload-result-info">
+        <span class="upload-check">✓ Imagen actualizada</span>
+        <button type="button" class="upload-change-btn" onclick="document.getElementById('img-hero-file').click()">Cambiar foto</button>
+      </div>
+    </div>
+    <span class="upload-status" id="img-hero-status"></span>
+  </div>
+
+  <label class="small">Foto — sección "Hecho a mano" (Inicio)</label>
+  <div style="margin-bottom:24px;">
+    <input type="file" id="img-about-file" accept="image/*" hidden>
+    <input type="hidden" id="img-about-url">
+    <label for="img-about-file" class="upload-trigger" id="img-about-trigger">
+      <span class="upload-icon">📷</span><span>Toca para subir una foto</span>
+    </label>
+    <div class="upload-result" id="img-about-result" style="display:none;">
+      <img id="img-about-preview" class="upload-thumb">
+      <div class="upload-result-info">
+        <span class="upload-check">✓ Imagen actualizada</span>
+        <button type="button" class="upload-change-btn" onclick="document.getElementById('img-about-file').click()">Cambiar foto</button>
+      </div>
+    </div>
+    <span class="upload-status" id="img-about-status"></span>
+  </div>
+
+  <label class="small">Foto — página "Nosotros"</label>
+  <div>
+    <input type="file" id="img-nosotros-file" accept="image/*" hidden>
+    <input type="hidden" id="img-nosotros-url">
+    <label for="img-nosotros-file" class="upload-trigger" id="img-nosotros-trigger">
+      <span class="upload-icon">📷</span><span>Toca para subir una foto</span>
+    </label>
+    <div class="upload-result" id="img-nosotros-result" style="display:none;">
+      <img id="img-nosotros-preview" class="upload-thumb">
+      <div class="upload-result-info">
+        <span class="upload-check">✓ Imagen actualizada</span>
+        <button type="button" class="upload-change-btn" onclick="document.getElementById('img-nosotros-file').click()">Cambiar foto</button>
+      </div>
+    </div>
+    <span class="upload-status" id="img-nosotros-status"></span>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script src="js/main.js"></script>
 <script src="js/animations.js"></script>
 <script>requireAdmin();</script>
@@ -68,6 +127,58 @@
       method: 'PUT',
     });
   }
+
+
+  async function cargarImagenSitio(clave, prefix) {
+  const url = await obtenerConfig(clave);
+  document.getElementById(`${prefix}-url`).value = url || '';
+  if (url) {
+    document.getElementById(`${prefix}-preview`).src = url;
+    document.getElementById(`${prefix}-result`).style.display = 'flex';
+    document.getElementById(`${prefix}-trigger`).style.display = 'none';
+  }
+}
+
+function wireImagenSitio(clave, prefix) {
+  document.getElementById(`${prefix}-file`).addEventListener('change', async function (e) {
+    const archivoOriginal = e.target.files[0];
+    if (!archivoOriginal) return;
+    const status = document.getElementById(`${prefix}-status`);
+    const trigger = document.getElementById(`${prefix}-trigger`);
+
+    let archivo;
+    try {
+      archivo = await openImageCropper(archivoOriginal, null); // recorte libre, cada espacio tiene proporción distinta
+    } catch {
+      e.target.value = '';
+      return;
+    }
+
+    status.className = 'upload-status uploading';
+    status.textContent = 'Subiendo imagen...';
+    try {
+      const url = await subirArchivo(archivo, 'imagen', archivoOriginal.name);
+      await guardarConfig(clave, url);
+      document.getElementById(`${prefix}-url`).value = url;
+      document.getElementById(`${prefix}-preview`).src = url;
+      document.getElementById(`${prefix}-result`).style.display = 'flex';
+      trigger.style.display = 'none';
+      status.className = 'upload-status';
+      status.textContent = '✓ Guardado';
+    } catch {
+      status.className = 'upload-status error';
+      status.textContent = 'Error al subir la imagen. Intenta de nuevo.';
+    }
+  });
+}
+
+wireImagenSitio('imagen_hero_index', 'img-hero');
+wireImagenSitio('imagen_about_index', 'img-about');
+wireImagenSitio('imagen_nosotros', 'img-nosotros');
+
+cargarImagenSitio('imagen_hero_index', 'img-hero');
+cargarImagenSitio('imagen_about_index', 'img-about');
+cargarImagenSitio('imagen_nosotros', 'img-nosotros');
 
   async function cargarAjustes() {
     document.getElementById('cfg-dias').value = await obtenerConfig('dias_minimos_anticipacion');
