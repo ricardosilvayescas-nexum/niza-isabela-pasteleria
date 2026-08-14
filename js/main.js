@@ -952,6 +952,17 @@ async function subirArchivo(archivo, tipo, nombreArchivo) {
   return data.url;
 }
 
+  async function aplicarImagenDinamica(elementId, claveConfig) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const url = await obtenerConfig(claveConfig);
+  if (url) {
+    el.style.backgroundImage = `url('${url}')`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+  }
+}
+
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -969,14 +980,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  async function aplicarImagenDinamica(elementId, claveConfig) {
-  const el = document.getElementById(elementId);
-  if (!el) return;
-  const url = await obtenerConfig(claveConfig);
-  if (url) {
-    el.style.backgroundImage = `url('${url}')`;
-    el.style.backgroundSize = 'cover';
-    el.style.backgroundPosition = 'center';
+
+
+async function obtenerConfig(clave) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/configuracion/${clave}`);
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.valor;
+  } catch {
+    return '';
   }
 }
 
