@@ -25,6 +25,8 @@ class Usuario(Base):
     password_hash = Column(String(255), nullable=False)
     telefono = Column(String(20))
     rol = Column(String(10), nullable=False, default="cliente")  # 'cliente' | 'admin'
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expira = Column(DateTime, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
 
 

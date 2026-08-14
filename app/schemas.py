@@ -266,3 +266,16 @@ class ResenaOut(BaseModel):
 
 class ResenaAdminUpdate(BaseModel):
     estado: str  # 'aprobada' | 'rechazada'
+
+
+class SolicitarResetPassword(BaseModel):
+    email: EmailStr
+
+
+class ConfirmarResetPassword(BaseModel):
+    token: str
+    password_nueva: str
+
+
+class MensajeSimple(BaseModel):
+    mensaje: str

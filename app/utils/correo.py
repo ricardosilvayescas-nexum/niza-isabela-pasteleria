@@ -145,3 +145,15 @@ def obtener_correo_notificaciones(db) -> str | None:
         models.Configuracion.clave == "correo_notificaciones"
     ).first()
     return config.valor if config and config.valor else None
+
+
+def correo_reset_password(nombre: str, link_reset: str) -> str:
+    cuerpo = f"""
+      <p>Hola {nombre},</p>
+      <p>Recibimos una solicitud para restablecer tu contraseña. Si fuiste tú, da clic en el siguiente botón:</p>
+      <p style="margin:24px 0;">
+        <a href="{link_reset}" style="background:#8D582E; color:#fff; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:600;">Crear nueva contraseña</a>
+      </p>
+      <p style="font-size:12px; color:#8A7860;">Este enlace expira en 1 hora. Si tú no solicitaste esto, puedes ignorar este correo — tu contraseña actual sigue siendo válida.</p>
+    """
+    return _plantilla_base("Restablece tu contraseña 🔑", cuerpo)

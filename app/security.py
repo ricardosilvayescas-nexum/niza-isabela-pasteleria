@@ -4,6 +4,7 @@ Todo lo relacionado a login: hashing de contraseñas, JWT, y las
 dependencias que protegen rutas (get_current_user, get_current_admin).
 """
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -90,3 +91,9 @@ def get_current_user_opcional(
         return None
 
     return db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
+
+
+def generar_reset_token() -> str:
+    """Token aleatorio, no predecible — no es un JWT porque queremos poder
+    invalidarlo desde la base de datos en cuanto se usa (los JWT no se pueden revocar)."""
+    return secrets.token_urlsafe(32)
